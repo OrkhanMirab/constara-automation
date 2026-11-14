@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:IB;src:url(file:///usr/share/fonts/opentype/inter/Inter-Bold.otf)}
+@font-face{font-family:MO;src:url(file:///usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf)}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/*TL*/
+// M14 «Fənər»: bölünmüş ekran. Yuxarı STARTER fənərlə yeriyir, izi = qrafik. Aşağı PLANNER xəritədə plan çəkib silir.
+const T = window.TL;
+const cv = document.getElementById('c'), X = cv.getContext('2d');
+const W = 1080, H = 1920, P1 = 330, P2 = 1050, PH = 660, PX = 30, PW = 1020, SPX = 14;
+const GOLD = '#F7C04A', RED = '#FF5A4A', WHITE = '#F4F1EA', GREY = '#A7ADB5';
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const eout = u => 1 - Math.pow(1 - u, 3);
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const bump = (t, c, w) => Math.exp(-Math.pow((t - c) / w, 2));
+const R = k => { let x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function dayAt(t) { const D = T.days; let d = D[0][1]; for (let i = 0; i < D.length - 1; i++) { const [a, d0] = D[i], [b, d1] = D[i + 1]; if (t >= a) { let u = clamp((t - a) / (b - a)); u = u * u * (3 - 2 * u); d = d0 + (d1 - d0) * u; } } return d; }
+const DIPS = T.stumble.map(s => dayAt(s) + .6);
+const sig = x => 1 / (1 + Math.exp(-x * 2.2));
+const hgt = d => .95 * d + 10 * Math.sin(d / 7) - 34 * sig(d - DIPS[0]) - 28 * sig(d - DIPS[1]);
+const HMAX = hgt(365);
+
+// ---------- fiqur (M13 mühərriki) ----------
+function ik(ax, ay, bx, by, l1, l2, flip) { let dx = bx - ax, dy = by - ay, d = Math.min(Math.hypot(dx, dy), l1 + l2 - .01);
+  let a = Math.atan2(dy, dx), c = Math.acos(clamp((l1 * l1 + d * d - l2 * l2) / (2 * l1 * d), -1, 1)), ang = a + (flip ? -c : c); return [ax + Math.cos(ang) * l1, ay + Math.sin(ang) * l1]; }
+function stroke(p, w) { X.beginPath(); X.moveTo(...p[0]); for (let i = 1; i < p.length; i++) X.lineTo(...p[i]); X.lineWidth = w; X.stroke(); }
+function fig(o) {
+  const s = o.s, dir = o.dir, col = o.col, ph = o.ph || 0;
+  const bob = o.walk ? Math.abs(Math.sin(ph)) * 8 * s : 0, hip = [o.x, o.base - 176 * s - bob + (o.drop || 0) * 60 * s];
+  let fA, fB;
+  if (o.walk) { const st = 36 * s; fA = [o.x + dir * Math.sin(ph) * st, o.base - Math.max(0, Math.cos(ph)) * 22 * s]; fB = [o.x - dir * Math.sin(ph) * st, o.base - Math.max(0, -Math.cos(ph)) * 22 * s]; }
+  else { fA = [o.x + dir * 18 * s, o.base]; fB = [o.x - dir * 16 * s, o.base]; }
+  const kA = ik(hip[0], hip[1], fA[0], fA[1], 90 * s, 90 * s, dir < 0), kB = ik(hip[0], hip[1], fB[0], fB[1], 90 * s, 90 * s, dir < 0);
+  const lean = (o.slump || 0) * .34 + (o.walk ? .1 : .03), neck = [hip[0] + dir * Math.sin(lean) * 160 * s, hip[1] - Math.cos(lean) * 160 * s];
+  const sh = [neck[0], neck[1] + 22 * s], sw = o.walk ? Math.sin(ph) * 46 * s : 0;
+  let hA = [sh[0] + dir * (12 * s - sw * .8), hip[1] + 24 * s], hB = [sh[0] - dir * (6 * s - sw * .8), hip[1] + 24 * s];
+  if (o.lantern) hA = [sh[0] + dir * 70 * s, sh[1] + 40 * s - (o.drop || 0) * 0];
+  if (o.reach) hA = [lerp(hA[0], o.reach[0], o.reach[2]), lerp(hA[1], o.reach[1], o.reach[2])];
+  const head = [neck[0] + dir * 8 * s, neck[1] - 46 * s + (o.down || 0) * 18 * s];
+  X.save(); X.lineCap = 'round'; X.lineJoin = 'round'; X.strokeStyle = col; X.fillStyle = col;
+  X.shadowColor = o.glow; X.shadowBlur = 26 * (o.gl == null ? 1 : o.gl);
+  stroke([hip, kB, fB], 28 * s); stroke([sh, ik(sh[0], sh[1], hB[0], hB[1], 85 * s, 85 * s, dir > 0), hB], 23 * s);
+  stroke([hip, neck], 50 * s); stroke([hip, kA, fA], 28 * s); stroke([sh, ik(sh[0], sh[1], hA[0], hA[1], 85 * s, 85 * s, !(o.lantern || o.reach) === (dir > 0)), hA], 23 * s);
+  X.beginPath(); X.arc(head[0], head[1], 37 * s, 0, 7); X.fill();
+  X.shadowBlur = 0; X.fillStyle = '#15171a'; X.beginPath(); X.arc(head[0] + dir * 17 * s, head[1] - 3 * s + (o.down || 0) * 9 * s, 4.6 * s, 0, 7); X.fill();
+  X.restore();
+  return { hand: hA, head };
+}
+
+// ---------- panel çərçivəsi ----------
+function panel(y, col, fn) {
+  X.save(); X.beginPath(); X.roundRect(PX, y, PW, PH, 28); X.clip(); X.translate(PX, y); fn(); X.restore();
+  X.save(); X.strokeStyle = col; X.lineWidth = 2; X.beginPath(); X.roundRect(PX, y, PW, PH, 28); X.stroke(); X.restore();
+}
+
+// ---------- STARTER ----------
+function starter(t) {
+  const d = dayAt(t), r = ease(seg(t, T.reveal, T.reveal + 1.8)), G = 470;
+  const zx = (PW - 140) / (365 * SPX), zy = Math.min(1.25, 470 / HMAX);
+  const map = (dd, hh) => { const w = [330 + (dd - d) * SPX, G - (hh - hgt(d))], v = [70 + dd * SPX * zx, 590 - hh * zy]; return [lerp(w[0], v[0], r), lerp(w[1], v[1], r)]; };
+  // fon: səma + uzaq təpələr (paralaks)
+  let g = X.createLinearGradient(0, 0, 0, PH); g.addColorStop(0, '#07080B'); g.addColorStop(1, '#100D08'); X.fillStyle = g; X.fillRect(0, 0, PW, PH);
+  for (let i = 0; i < 70; i++) { const x = ((R(i) * 1400 - d * SPX * .05 * (1 - r)) % 1400 + 1400) % 1400 - 200; X.fillStyle = `rgba(255,240,210,${.1 + .25 * R(i + 4)})`; X.fillRect(x, R(i + 2) * 330, 2, 2); }
+  X.fillStyle = '#0d0c0a'; X.beginPath(); X.moveTo(0, PH);
+  for (let x = 0; x <= PW; x += 20) { const wx = x + d * SPX * .18 * (1 - r); X.lineTo(x, 420 - 60 * Math.sin(wx / 230) - 35 * Math.sin(wx / 97 + 1)); }
+  X.lineTo(PW, PH); X.fill();
+  // fənər işığı (iz və fiqurdan əvvəl)
+  const fp = map(d, hgt(d)), lr = (150 + Math.min(320, d * .9)) * (1 - .5 * r);
+  X.save(); X.globalCompositeOperation = 'lighter';
+  let lg = X.createRadialGradient(fp[0] + 30, fp[1] - 90, 10, fp[0] + 30, fp[1] - 90, lr); lg.addColorStop(0, `rgba(255,190,100,${.32 * (1 - .6 * r)})`); lg.addColorStop(1, 'rgba(255,150,60,0)');
+  X.fillStyle = lg; X.fillRect(fp[0] - lr, fp[1] - lr - 90, lr * 2 + 60, lr * 2); X.restore();
+  // iz = qrafik (sahə + xətt)
+  const step = .5, pts = []; for (let dd = 0; dd <= d; dd += step) pts.push([dd, map(dd, hgt(dd))]); pts.push([d, fp]);
+  let ag = X.createLinearGradient(0, 200, 0, PH); ag.addColorStop(0, `rgba(247,192,74,${.18 + .1 * r})`); ag.addColorStop(1, 'rgba(247,192,74,0)');
+  X.fillStyle = ag; X.beginPath(); X.moveTo(pts[0][1][0], PH); pts.forEach(p => X.lineTo(...p[1])); X.lineTo(fp[0], PH); X.fill();
+  X.save(); X.lineCap = 'round'; X.lineJoin = 'round'; X.strokeStyle = GOLD; X.lineWidth = lerp(7, 5, r); X.shadowColor = GOLD; X.shadowBlur = 20;
+  X.beginPath(); pts.forEach((p, i) => i ? X.lineTo(...p[1]) : X.moveTo(...p[1])); X.stroke();
+  X.strokeStyle = RED; X.shadowColor = RED;
+  DIPS.forEach(c => { if (d < c - 1.5) return; X.beginPath(); let f = 1; for (let dd = c - 1.5; dd <= Math.min(d, c + 1.5); dd += .25) { const p = map(dd, hgt(dd)); f ? X.moveTo(...p) : X.lineTo(...p); f = 0; } X.stroke(); });
+  X.restore();
+  // −5 etiketləri
+  T.stumble.forEach((s0, k) => { const dt = t - s0; if (dt < 0) return; const p = map(DIPS[k], hgt(DIPS[k]));
+    const a = r > 0 ? r : clamp(1 - (dt - .9) / .6) * seg(dt, 0, .15);
+    if (a <= 0) return; X.save(); X.globalAlpha = a; X.font = `${r > 0 ? 30 : 44}px MO`; X.textAlign = 'center'; X.fillStyle = RED; X.shadowColor = RED; X.shadowBlur = 16; X.fillText('−5', p[0], p[1] + (r > 0 ? -22 : 60)); X.restore(); });
+  // fiqur
+  const st = T.stumble.map(s0 => bump(t, s0 + .35, .32)).reduce((a, b) => Math.max(a, b), 0);
+  const s = lerp(.5, .3, r);
+  const me = fig({ x: fp[0], base: fp[1] - 4, s, dir: 1, col: '#FFD98A', glow: 'rgba(255,200,110,.85)', walk: st < .3 && t > 2.3 && t < T.reveal + 1.2, ph: t * 7.2, lantern: 1, slump: st * 1.3, drop: st * .7, down: st });
+  // fənər
+  const h = me.hand; X.save(); X.globalCompositeOperation = 'lighter';
+  let bg = X.createRadialGradient(h[0] + 6, h[1] + 26 * s, 1, h[0] + 6, h[1] + 26 * s, 70 * s); bg.addColorStop(0, 'rgba(255,230,160,1)'); bg.addColorStop(1, 'rgba(255,160,60,0)');
+  X.fillStyle = bg; X.fillRect(h[0] - 80 * s, h[1] - 50 * s, 170 * s, 160 * s); X.restore();
+  X.fillStyle = '#2a2015'; X.fillRect(h[0] - 2, h[1], 4, 12 * s); X.strokeStyle = '#C79A4A'; X.lineWidth = 3; X.strokeRect(h[0] - 14 * s, h[1] + 12 * s, 28 * s, 34 * s);
+  X.fillStyle = 'rgba(255,225,150,.95)'; X.fillRect(h[0] - 10 * s, h[1] + 16 * s, 20 * s, 26 * s);
+  // REVEAL: qrafik oxu + son xal
+  if (r > 0) { X.save(); X.globalAlpha = r; X.strokeStyle = 'rgba(255,255,255,.18)'; X.lineWidth = 2; X.setLineDash([6, 10]);
+    X.beginPath(); X.moveTo(70, 590); X.lineTo(PW - 50, 590); X.stroke(); X.setLineDash([]);
+    X.font = '24px MO'; X.fillStyle = 'rgba(220,220,220,.6)'; X.textAlign = 'left'; X.fillText('DAY 1', 60, 625); X.textAlign = 'right'; X.fillText('DAY 365', PW - 60, 625);
+    X.font = '52px MO'; X.fillStyle = GOLD; X.shadowColor = GOLD; X.shadowBlur = 22; X.textAlign = 'right'; X.fillText('+' + score(365), fp[0] - 50, fp[1] + 10); X.restore(); }
+}
+const score = d => Math.round(d - 5 * DIPS.filter(c => d > c).length);
+
+// ---------- PLANNER ----------
+const MAP = [400, 210, 520, 250];   // x, y, w, h
+function route(v, u) {  // v-ci plan, u ∈ 0..1 → nöqtə
+  const [mx, my, mw, mh] = MAP, x = mx + 40 + u * (mw - 80);
+  return [x, my + mh / 2 + Math.sin(u * 6 + v * 1.7) * mh * .25 + Math.sin(u * 13 + v) * mh * .08];
+}
+function planner(t) {
+  const d = dayAt(t), v = 1 + Math.floor(d / 9), r = seg(t, T.reveal, T.reveal + 1), C = 1.12;
+  let g = X.createLinearGradient(0, 0, 0, PH); g.addColorStop(0, '#0A0C10'); g.addColorStop(1, '#07080A'); X.fillStyle = g; X.fillRect(0, 0, PW, PH);
+  // döşəmə = onun «qrafiki»: düz xətt
+  const FL = 560; X.strokeStyle = 'rgba(167,173,181,.55)'; X.lineWidth = 4; X.beginPath(); X.moveTo(0, FL); X.lineTo(PW, FL); X.stroke();
+  X.fillStyle = 'rgba(167,173,181,.08)'; X.fillRect(0, FL, PW, PH - FL);
+  // xəritə (mavi plan kağızı)
+  const [mx, my, mw, mh] = MAP;
+  X.save(); X.globalCompositeOperation = 'lighter'; let mg = X.createRadialGradient(mx + mw / 2, my + mh / 2, 50, mx + mw / 2, my + mh / 2, 520); mg.addColorStop(0, 'rgba(90,150,220,.13)'); mg.addColorStop(1, 'rgba(0,0,0,0)'); X.fillStyle = mg; X.fillRect(0, 0, PW, PH); X.restore();
+  X.fillStyle = '#0F1B2C'; X.fillRect(mx, my, mw, mh); X.strokeStyle = 'rgba(140,190,240,.5)'; X.lineWidth = 3; X.strokeRect(mx, my, mw, mh);
+  X.strokeStyle = 'rgba(140,190,240,.12)'; X.lineWidth = 1; for (let x = mx + 30; x < mx + mw; x += 30) { X.beginPath(); X.moveTo(x, my); X.lineTo(x, my + mh); X.stroke(); } for (let y = my + 30; y < my + mh; y += 30) { X.beginPath(); X.moveTo(mx, y); X.lineTo(mx + mw, y); X.stroke(); }
+  X.fillStyle = 'rgba(140,190,240,.7)'; X.beginPath(); X.arc(mx + 40, route(v, 0)[1], 8, 0, 7); X.fill();
+  X.font = '26px MO'; X.fillStyle = '#E8B04A'; X.fillText('★', mx + mw - 52, route(v, 1)[1] + 9);
+  // plan dövrü: çək → X → sil
+  const active = t > 2.2 && t < T.reveal, u = active ? ((t - 2.2) / C) % 1 : 0, draw = active ? clamp(u / .68) : 0;
+  const ea = active ? 1 - seg(u, .86, 1) : (r > 0 ? 0 : 0);
+  if (draw > 0) { X.save(); X.globalAlpha = ea; X.strokeStyle = 'rgba(200,225,255,.9)'; X.lineWidth = 4; X.setLineDash([12, 8]); X.beginPath();
+    for (let k = 0; k <= 40 * draw; k++) { const p = route(v, k / 40); k ? X.lineTo(...p) : X.moveTo(...p); } X.stroke(); X.setLineDash([]);
+    const xa = seg(u, .7, .78); if (xa > 0) { X.strokeStyle = RED; X.lineWidth = 7; X.shadowColor = RED; X.shadowBlur = 12; const cx = mx + mw / 2, cy = my + mh / 2, L = 90 * xa;
+      X.beginPath(); X.moveTo(cx - L, cy - L * .7); X.lineTo(cx + L, cy + L * .7); X.moveTo(cx + L, cy - L * .7); X.lineTo(cx - L, cy + L * .7); X.stroke(); }
+    X.restore(); }
+  X.font = '26px MO'; X.letterSpacing = '4px'; X.fillStyle = 'rgba(167,173,181,.85)'; X.textAlign = 'left'; X.fillText(`PLAN v${v}`, mx, my - 22); X.letterSpacing = '0px';
+  // kağız topları
+  for (let k = 0; k < v - 1; k++) { const row = Math.floor(Math.sqrt(k)), x = 120 + (R(k) - .5) * (60 + row * 40) + row * 4, y = FL - 14 - row * 0 - R(k + 3) * 6 * row;
+    const pk = k === v - 2 && active ? eout(seg(u, .86, 1)) : 1; if (pk <= 0) continue;
+    X.fillStyle = '#C9CDD2'; X.strokeStyle = '#7f858d'; X.lineWidth = 2; X.beginPath(); X.arc(x + (1 - pk) * 200, y - (1 - pk) * 160 - (k % 5) * 4, 13 + R(k + 7) * 4, 0, 7); X.fill(); X.stroke(); }
+  // sönük lampa
+  X.strokeStyle = '#2a2d31'; X.lineWidth = 3; X.beginPath(); X.moveTo(300, 0); X.lineTo(300, 60); X.stroke();
+  X.fillStyle = '#1a1c20'; X.beginPath(); X.arc(300, 76, 18, 0, 7); X.fill(); X.strokeStyle = 'rgba(255,255,255,.12)'; X.lineWidth = 2; X.stroke();
+  // fiqur: qələm xəritədə
+  const pen = draw > 0 ? route(v, draw) : [mx + 40, my + mh / 2];
+  const look = seg(t, T.reveal + .2, T.reveal + .9);
+  // fiqur xəritə boyunca qələmin arxasınca gedir (silərkən geri qayıdır)
+  const back = active ? seg(u, .86, 1) : 0, fx = lerp(lerp(mx - 20, pen[0] - 75, active ? 1 : 0), mx - 20, back);
+  const sc = .62, shY = FL - (176 + 138) * sc, pr = [Math.min(pen[0], fx + 150 * sc), Math.max(pen[1], shY - 40 * sc)];
+  fig({ x: fx, base: FL, s: sc, dir: 1, col: '#B8BDC4', glow: 'rgba(150,170,200,.45)', gl: .6, slump: .12 + .3 * seg(t, 3, 17) - .3 * look,
+    walk: active && back > 0 && back < 1, ph: t * 12, reach: [pr[0], pr[1], active && back === 0 ? 1 : .6 * (1 - look) * (1 - back)], down: lerp(.1, -.9, look) });
+  // xal: 0
+  if (r > 0) { X.save(); X.globalAlpha = r; X.font = '52px MO'; X.fillStyle = GREY; X.textAlign = 'right'; X.fillText('0', PW - 60, FL - 24); X.restore(); }
+}
+
+// ---------- mətn ----------
+function caption(t) {
+  for (const [a, b, txt, hi, hc] of T.texts) {
+    if (t < a || t > b) continue;
+    const al = Math.min(seg(t, a, a + .25), 1 - seg(t, b - .2, b)), lines = txt.split('\n');
+    X.save(); X.globalAlpha = al; X.font = (lines.length > 2 || txt.length > 40 ? '38px' : '46px') + ' MO'; X.letterSpacing = '3px'; X.textBaseline = 'middle';
+    const lh = lines.length > 2 ? 56 : 64, y0 = 215 - (lines.length - 1) * lh / 2 + (1 - eout(seg(t, a, a + .35))) * 12;
+    lines.forEach((ln, li) => {
+      let x = W / 2 - X.measureText(ln).width / 2, y = y0 + li * lh, i = ln.indexOf(hi);
+      const parts = i < 0 ? [[ln, WHITE]] : [[ln.slice(0, i), WHITE], [hi, hc === 'red' ? RED : GOLD], [ln.slice(i + hi.length), WHITE]];
+      for (const [p, c] of parts) { if (!p) continue; X.fillStyle = c; X.shadowColor = c === WHITE ? 'rgba(0,0,0,.6)' : c; X.shadowBlur = c === WHITE ? 8 : 18; X.fillText(p, x, y); x += X.measureText(p).width; }
+    });
+    X.restore();
+  }
+}
+function pill(x, y, txt, col, bg, align) {
+  X.save(); X.font = '28px MO'; X.letterSpacing = '3px'; const w = X.measureText(txt).width + 40, x0 = align === 'c' ? x - w / 2 : align === 'r' ? x - w : x;
+  X.fillStyle = bg; X.strokeStyle = col; X.lineWidth = 2; X.beginPath(); X.roundRect(x0, y - 26, w, 52, 26); X.fill(); X.stroke();
+  X.fillStyle = col; X.textBaseline = 'middle'; X.fillText(txt, x0 + 20, y + 1); X.restore();
+}
+
+window.draw = function (t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.globalCompositeOperation = 'source-over'; X.shadowBlur = 0; X.letterSpacing = '0px';
+  X.fillStyle = '#050506'; X.fillRect(0, 0, W, H);
+  const d = dayAt(t), intro = eout(seg(t, 0, .6));
+  X.save(); X.globalAlpha = intro;
+  panel(P1, 'rgba(247,192,74,.35)', () => starter(t));
+  panel(P2, 'rgba(167,173,181,.25)', () => planner(t));
+  X.restore();
+  // etiketlər
+  X.save(); X.globalAlpha = intro; X.font = '30px MO'; X.letterSpacing = '6px'; X.textBaseline = 'middle';
+  X.fillStyle = GOLD; X.shadowColor = GOLD; X.shadowBlur = 14; X.fillText('THE STARTER', PX + 34, P1 + 46);
+  X.fillStyle = GREY; X.shadowBlur = 0; X.fillText('THE PLANNER', PX + 34, P2 + 46); X.restore();
+  pill(PX + PW - 26, P1 + 46, `SCORE +${score(d)}`, GOLD, 'rgba(20,16,8,.85)', 'r');
+  pill(PX + PW - 26, P2 + 46, 'SCORE 0', GREY, 'rgba(14,15,17,.85)', 'r');
+  pill(W / 2, (P1 + PH + P2) / 2, `DAY ${Math.round(d)}`, WHITE, 'rgba(8,8,10,.95)', 'c');
+  // vinyet + dənə
+  let vg = X.createRadialGradient(540, 1000, 500, 540, 1000, 1250); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.5)'); X.fillStyle = vg; X.fillRect(0, 0, W, H);
+  for (let i = 0; i < 700; i++) { X.fillStyle = `rgba(255,255,255,${.016 * R(i + Math.floor(t * 24) * 13)})`; X.fillRect(R(i * 3 + Math.floor(t * 24)) * W, R(i * 5 + 1 + Math.floor(t * 24)) * H, 2, 2); }
+  caption(t);
+  const ea = seg(t, T.end + .5, T.end + 1); if (ea > 0) { X.save(); X.globalAlpha = ea; X.fillStyle = 'rgba(225,220,205,.92)'; X.font = '34px MO'; X.letterSpacing = '6px'; X.textAlign = 'center'; X.fillText('@constara.app', W / 2 + 3, 1820); X.restore(); }
+};
+document.fonts.ready.then(() => { window.READY = true; });
+['MO', 'IB'].forEach(f => document.fonts.load('40px ' + f));
+</script></body></html>
