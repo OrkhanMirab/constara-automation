@@ -20,7 +20,7 @@ Hər video bir metafordur. Başqasının səhnəsini (daş və çəkic, dəmirç
 | M04 | Yay və ox | «Life keeps pulling you back.» | ox geri çəkilir, kəndir gərilir, sonra uçur | Geri çəkilmirsən, nişan alırsan | büdrəmə (−5) sonrası |
 | M05 | Bambuk | «4 years. Nothing.» | torpaq kəsiyi: yuxarıda heç nə yoxdur, aşağıda köklər böyüyür; sonra 6 həftədə 30 m | Ilişməmisən, kök atırsan | uzun seriya |
 | M06 | 1% yollar ✅ 11-14 | «It's just one day.» | iki fiqur: 1,01 pilləkənlə qalxır, 0,99 enir; 365-ci gündə 37,8 və 0,03 | Bir gün = bir faiz | qrafik, iki xətt |
-| M07 | Batareya | «Why am I always tired?» | fiqurun üstündə batareya: SCROLL −20%, LATE NIGHT −30%, WALK +15%, SLEEP +40% | Yorğunluq yox, sızma var | pis/yaxşı vərdiş xalı |
+| M07 | Batareya ✅ 11-15 (11 s loop) | «Why am I always tired?» | fiqurun üstündə batareya: SCROLL −20%, LATE NIGHT −30%, WALK +15%, SLEEP +40% | Yorğunluq yox, sızma var | pis/yaxşı vərdiş xalı |
 | M08 | Daş, çınqıl, qum | «No time for what matters.» | banka (M01 mühərriki): əvvəl qum doldurulur və daşlar sığmır; tərsinə edəndə hamısı sığır | Böyük daşlar əvvəl | gündəlik tapşırıq sırası |
 | M09 | Karandaş | «Why does it hurt so much?» | yonma: hər dövrdə ucu itiləşir, sonda yazır | Kəsik ucu itiləşdirir | intizam |
 

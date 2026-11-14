@@ -42,8 +42,12 @@ sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyə
 - **Metafor + diktor (11-14).** M12 «Masa» 9 saatda son videolar arasında ən çox göndərilən (n=1). Bütün metaforlar diktorlu, CTA «Send this to…».
   Kino formatı dayandırıldı (K01 istifadəçi tərəfindən silindi, K02 avg izləmə ən aşağı).
 
+- **Ortalama izləmə lideri M13 «Körpü» (11-15, 13.5 s).** Konkret münasibət mövzusu + aydın mexanika (taxta düşür −1 / qızılı +1). Dostluq/münasibət (M12, M13) göndərmə gətirir (n=2, sınaq).
+- **M07 «Batareya» (11-15): 11 s loop** — kart zərbələri ritmə (120 bpm) düşür, son kadr = ilk kadr, səs quyruğu başa qatlanır; CTA şərh sualı. M15 ilə birlikdə qısa loop formatının 2-ci sınağı.
+
 ## Tarixçə
 - 2026-11-11: ilk analiz (29 post, 61 izləyici). Qaydalar 1–4 yazıldı.
 - 2026-11-12: dünənki 4 post erkən (bazada). Xal testi #1 avg izləmə «3 signs» səviyyəsində. Açıq döngə sınağı + narkotik mövzusu qadağası. İzləyici 66.
 - 2026-11-13: hamısı ~110 bazada (3 signs, Xal #1, Metafor M10); Kino K02 erkən zəif (avg 4.4 s, 6 s). İzləyici 74 (+8). Yenilik: Xal canlı sayğac.
 - 2026-11-14: M12 Masa share lideri; K01 silinib. Bugün M02 Buz kubu + M06 1% (diktorlu metafor, kamera geri çəkilməsi yeniliyi).
+- 2026-11-15: M13 avg 13.5 s lider; M02 IG ProcessingFailedError → yalnız IG-yə təkrar. Bugün M02 (IG) + M07 loop.
