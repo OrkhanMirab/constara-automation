@@ -13,6 +13,7 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 
 const T = window.TL;
 const W = 1080, H = 1920;
@@ -609,5 +610,5 @@ window.draw = function (t) {
   if (t >= T.end) { const a = seg(t, T.end + .6, T.end + 1.1); X.save(); X.globalAlpha = a; X.fillStyle = 'rgba(225,220,205,.92)'; X.font = '34px MO'; X.letterSpacing = '6px'; X.textAlign = 'center'; X.shadowColor = 'rgba(0,0,0,.9)'; X.shadowBlur = 10; X.fillText('@constara.app', W / 2 + 3, 1790); X.restore(); }
 };
 const glb = Uint8Array.from(atob(window.XBOT), c => c.charCodeAt(0)).buffer;
-new GLTFLoader().parse(glb, '', g => { initHumans(g); document.fonts.ready.then(() => { window.draw(0); window.READY = true; }); }, e => console.error('GLB', e));
-['MO', 'IB'].forEach(f => document.fonts.load('40px ' + f));
+new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parse(glb, '', g => { initHumans(g); document.fonts.ready.then(() => { window.draw(0); window.READY = true; }); }, e => console.error('GLB', e));
+document.fonts.load('40px MO');

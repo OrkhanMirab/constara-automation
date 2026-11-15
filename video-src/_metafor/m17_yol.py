@@ -6,7 +6,8 @@ daha gerçəkçi, premium görünüşlü animasiya». Hekayə eyni (pis planla b
 ayağının altındakı iz işıqlanır; Planner masa lampası altında plan çəkib atır (PLAN vN). Sonda kamera geri çəkilir:
 silsilənin profili + qızılı iz = Constara qrafiki (iki −5 enişi), aşağıda Planner-in lampası «0».
 Asılılıq: _build/node_modules (npm i --prefix _build three@0.170.0 esbuild@0.24.0), scipy (səs),
-_build/models/Xbot.glb (three.js r170 examples/models/gltf/Xbot.glb — Mixamo X Bot, idle/walk mocap).
+_build/models/Xbot-slim.glb (three.js r170 examples/models/gltf/Xbot.glb — Mixamo X Bot; _build/slim.mjs ilə
+yalnız idle+walk saxlanılır, quantize + meshopt → ~0.8 MB; telefon önizləməsi 6 MB faylı açmadı).
 İşlətmə: python3 m17_yol.py <scratch> [--no-audio] [--tts <kokoro qovluğu>]
          önizləmə: python3 onizleme.py <scratch> <out.html> (sonra m17_yol.py --fix-preview <out.html>)
          kadrlar: cp render3d.mjs <scratch>/ ; node render3d.mjs <scratch>   (WebGL üçün swiftshader bayraqları)
@@ -182,7 +183,7 @@ def run(scr):
     os.makedirs(scr, exist_ok=True)
     html = open(os.path.join(HERE, 'm17_scene.html')).read()
     import base64
-    xbot = base64.b64encode(open(os.path.join(HERE, '_build', 'models', 'Xbot.glb'), 'rb').read()).decode()
+    xbot = base64.b64encode(open(os.path.join(HERE, '_build', 'models', 'Xbot-slim.glb'), 'rb').read()).decode()
     html = html.replace('/*TL*/', 'window.TL=' + json.dumps(TL) + ';window.XBOT="' + xbot + '";').replace('/*BUNDLE*/', bundle().replace('</script', '<\\/script'))
     open(os.path.join(scr, 'index.html'), 'w').write(html)
     if '--no-audio' not in sys.argv:
