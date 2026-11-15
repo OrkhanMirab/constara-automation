@@ -21,6 +21,12 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 
 6. **Daimi yenilik (11-12, istifadəçi qərarı).** Tək şablon zamanla bazaya enir (v15–v18 eyni şablon idi). Hər gün 1 yaradıcı yenilik, həftədə 1 yeni format; qalibi rəqəm seçir.
 
+7. **Bölünmüş ekran «X vs Y» + 2D insan siluetləri = əsas format** (11-16, n=2 partlayış / 2 video: M14, M19; avg izləmə bazanın ~1.8×-i, reach ~10×).
+   Eyni hekayə tək səhnədə (M17) bazada qaldı → itələyən quruluşdur: iki panel, iki ad etiketi (THE X / THE Y), iki sayğac (SCORE, DAY), ortada DAY pill,
+   bir personaj −5 büdrəyir və davam edir, o biri 0-da qalır, sonda yuxarı panel geri çəkilir → iz = qrafik (+N vs 0), son cümlə = çevrilmə, CTA «Send this to someone still…».
+   Qayda: gündəlik 2 Reels-in hər ikisi bu quruluşda, **hər dəfə yeni mövzu və yeni vizual dünya** (göl, dağ olub). ~26 s, diktorlu.
+8. **Qısa 11 s loop dayandırıldı** (11-16, n=2: M15, M07 — avg izləmə ən aşağı qrupda, reach baza). Qayıtmaq yalnız istifadəçi istəsə.
+
 ## Bazada qalanlar (təkrar etmə, ən azı 2 həftə)
 sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyəti); weed (11-12: bazada + FB yükləməsi uğursuz — **narkotik mövzuları YOX**).
 
@@ -52,3 +58,4 @@ sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyə
 - 2026-11-13: hamısı ~110 bazada (3 signs, Xal #1, Metafor M10); Kino K02 erkən zəif (avg 4.4 s, 6 s). İzləyici 74 (+8). Yenilik: Xal canlı sayğac.
 - 2026-11-14: M12 Masa share lideri; K01 silinib. Bugün M02 Buz kubu + M06 1% (diktorlu metafor, kamera geri çəkilməsi yeniliyi).
 - 2026-11-15: M13 avg 13.5 s lider; M02 IG ProcessingFailedError → yalnız IG-yə təkrar. Bugün M02 (IG) + M07 loop.
+- 2026-11-16: M19 Göl partladı (bölünmüş ekran 2/2). Qısa loop (M07, M15) zəif → dayandırıldı. Bugün M20 Divar (builder vs scroller) + M21 Zəngli saat (early vs snoozer). İzləyici 79.
