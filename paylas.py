@@ -5,6 +5,8 @@ sonra qovlugu posted/<ad>/ (ugurlu) ve ya failed/<ad>/ (xeta) qovluguna kocurur.
 GitHub Actions bunu saatda bir defe ve queue/ deyisende isledir.
 
 Env: IG_ACCESS_TOKEN, IG_USER_ID, FB_PAGE_TOKEN, FB_PAGE_ID (GitHub Secrets), GITHUB_REPOSITORY, GITHUB_SHA.
+YouTube (yalniz reels -> Shorts): YT_CLIENT_ID, YT_CLIENT_SECRET, YT_REFRESH_TOKEN; YT_PRIVACY
+(susmaya gore "private": Google auditi kecilene qeder API yuklemeleri onsuz da private qalir).
 Yalniz Python standart kitabxanasi.
 
 post.json:
@@ -14,7 +16,8 @@ post.json:
   "media": ["1.jpg", "2.jpg"],          // reels ucun: ["video.mp4"]
   "publish_after": "2026-11-09T18:00:00+03:00",   // istege bagli; yoxdursa derhal
   "share_to_feed": true,                // istege bagli, yalniz reels
-  "platforms": ["instagram", "facebook"] // istege bagli; susmaya gore ikisi de
+  "platforms": ["instagram", "facebook"] // istege bagli; susmaya gore ikisi de (+ reels-de youtube)
+  "yt_title": "..."                     // istege bagli; yoxdursa caption-un 1-ci setri (<=100 simvol)
 }
 Gundelik plan (plan/YYYY-MM-DD.json + schedule.json, bax plan.py) de burda paylasilir:
 media runner-de gen/ ile hazirlanir, sekiller 'media' budagina (tek commit, force) qoyulur,
@@ -42,6 +45,18 @@ IG = os.environ.get("IG_USER_ID", "")
 FB_TOKEN = os.environ.get("FB_PAGE_TOKEN", "")
 FB_PAGE = os.environ.get("FB_PAGE_ID", "")
 PLATFORMS = ("instagram", "facebook")
+YT_ID = os.environ.get("YT_CLIENT_ID", "")
+YT_SECRET = os.environ.get("YT_CLIENT_SECRET", "")
+YT_REFRESH = os.environ.get("YT_REFRESH_TOKEN", "")
+YT_PRIVACY = os.environ.get("YT_PRIVACY", "private")
+
+
+def default_platforms(typ):
+    """Susmaya gore platformalar: IG + FB; reels-de YouTube secret-leri varsa YouTube Shorts da."""
+    ps = list(PLATFORMS)
+    if typ == "reels" and YT_REFRESH:
+        ps.append("youtube")
+    return ps
 REPO = os.environ.get("GITHUB_REPOSITORY", "OrkhanMirab/constara-instagram")
 def _head_sha():
     # Dovre run-u yeni commit-leri pull edir, GITHUB_SHA ise kohne qalir -> raw URL-de cari HEAD lazimdir
@@ -264,7 +279,70 @@ def publish_facebook(d: Path, post: dict) -> dict:
     return {"video_id": vid, "permalink": fb_link(vid)}
 
 
-PUBLISHERS = {"instagram": publish_instagram, "facebook": publish_facebook}
+def yt_token():
+    data = urllib.parse.urlencode({"client_id": YT_ID, "client_secret": YT_SECRET,
+                                   "refresh_token": YT_REFRESH, "grant_type": "refresh_token"}).encode()
+    req = urllib.request.Request("https://oauth2.googleapis.com/token", data=data, method="POST", headers=UA)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode())["access_token"]
+    except urllib.error.HTTPError as e:
+        raise PostError(f"youtube token -> HTTP {e.code}: {e.read().decode()[:300]}") from None
+
+
+def yt_meta(post: dict):
+    """Baslig (<=100, #Shorts ile), aciqlama (linksiz caption), teqler (hashtag-lerden)."""
+    caption = post.get("caption", "")
+    title = (post.get("yt_title") or (post.get("content") or {}).get("yt_title") or "").strip()
+    if not title:
+        first = next((l.strip() for l in caption.splitlines() if l.strip()), "Constara")
+        title = " ".join(w for w in first.split() if not w.startswith("#"))
+    title = title.replace("<", "").replace(">", "")
+    if "#shorts" not in title.lower():
+        title = title[:100 - 8].rstrip() + " #Shorts"
+    tags = [w.strip("#.,!?") for w in caption.split() if w.startswith("#")][:15]
+    desc = caption.replace("<", "").replace(">", "")[:4900]
+    return title[:100], desc, tags
+
+
+def publish_youtube(d: Path, post: dict) -> dict:
+    if not (YT_ID and YT_SECRET and YT_REFRESH):
+        raise PostError("YT_CLIENT_ID / YT_CLIENT_SECRET / YT_REFRESH_TOKEN yoxdur (GitHub Secrets)")
+    typ, caption, media = validate(d, post)
+    if typ != "reels":
+        raise PostError(f"youtube yalniz reels (Shorts) qebul edir, bu: {typ}")
+    tok = yt_token()
+    title, desc, tags = yt_meta(post)
+    data = media[0].read_bytes()
+    meta = {"snippet": {"title": title, "description": desc, "tags": tags, "categoryId": "22"},
+            "status": {"privacyStatus": YT_PRIVACY, "selfDeclaredMadeForKids": False,
+                       "embeddable": True}}
+    req = urllib.request.Request(
+        "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
+        data=json.dumps(meta).encode(), method="POST",
+        headers={**UA, "Authorization": f"Bearer {tok}", "Content-Type": "application/json; charset=UTF-8",
+                 "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(len(data))})
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            loc = r.headers.get("Location")
+    except urllib.error.HTTPError as e:
+        raise PostError(f"youtube start -> HTTP {e.code}: {e.read().decode()[:400]}") from None
+    if not loc:
+        raise PostError("youtube resumable Location qaytarmadi")
+    req = urllib.request.Request(loc, data=data, method="PUT",
+                                 headers={**UA, "Authorization": f"Bearer {tok}", "Content-Type": "video/mp4"})
+    try:
+        with urllib.request.urlopen(req, timeout=900) as r:
+            res = json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        raise PostError(f"youtube upload -> HTTP {e.code}: {e.read().decode()[:400]}") from None
+    vid = res["id"]
+    print(f"   youtube yuklendi ({len(data) // 1024} KB, {res.get('status', {}).get('privacyStatus')})")
+    return {"video_id": vid, "permalink": f"https://www.youtube.com/shorts/{vid}",
+            "title": title, "privacy": res.get("status", {}).get("privacyStatus")}
+
+
+PUBLISHERS = {"instagram": publish_instagram, "facebook": publish_facebook, "youtube": publish_youtube}
 
 
 def due(post: dict) -> bool:
@@ -300,7 +378,7 @@ def move(d: Path, dest_root: Path, info: dict):
 
 def publish_post(d: Path, post: dict):
     """Butun platformalara paylasir. (result, ok_sayi, platformalar) qaytarir."""
-    platforms = post.get("platforms") or list(PLATFORMS)
+    platforms = post.get("platforms") or default_platforms(post.get("type"))
     print(f"▶ {d.name} ({post.get('type')}) -> {', '.join(platforms)}")
     result, ok = {}, 0
     for p in platforms:
@@ -383,7 +461,7 @@ def run_plan(budget: int) -> int:
             break
         build = ROOT / "_build" / item_id
         post = {"type": typ, "caption": content.get("caption", ""), "slot": slot.isoformat(),
-                "platforms": content.get("platforms") or list(PLATFORMS), "content": content}
+                "platforms": content.get("platforms") or default_platforms(typ), "content": content}
         try:
             names = render_item(typ, content, build)
             post["media"] = names
