@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 HOST = os.environ.get("IG_API_HOST", "graph.facebook.com")
 TOKEN = os.environ.get("IG_ACCESS_TOKEN", "")
-UA = {"User-Agent": "constara-instagram/1.0"}
+UA = {"User-Agent": "constara-automation/1.0"}
 
 
 def delete(mid):

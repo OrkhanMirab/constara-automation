@@ -1,4 +1,4 @@
-# constara-instagram
+# constara-automation
 
 @constara.app Instagram hesabına və **Constara.app** Facebook səhifəsinə avtomatik paylaşma. Kod yalnız Python standart kitabxanasını işlədir.
 

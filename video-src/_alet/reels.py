@@ -1,6 +1,6 @@
 """Gundelik diktorlu Reels (v16 «3 signs» sablonu) -> render -> 'reels/<tarix>' budagi -> plan/<tarix>.json.
 
-Islet (constara-instagram kokunden):
+Islet (constara-automation kokunden):
   python3 video-src/_alet/reels.py <tarix> <reels.json> <is-qovlugu> [--from HH:MM]
 reels.json: [cfg, ...] (4 eded), cfg:
   {"title": "QUITTING SMOKING", "fs": 46, "row": "No cigarette", "bg": "#2F6FDE",

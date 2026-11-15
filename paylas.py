@@ -57,7 +57,7 @@ def default_platforms(typ):
     if typ == "reels" and YT_REFRESH:
         ps.append("youtube")
     return ps
-REPO = os.environ.get("GITHUB_REPOSITORY", "OrkhanMirab/constara-instagram")
+REPO = os.environ.get("GITHUB_REPOSITORY", "OrkhanMirab/constara-automation")
 def _head_sha():
     # Dovre run-u yeni commit-leri pull edir, GITHUB_SHA ise kohne qalir -> raw URL-de cari HEAD lazimdir
     try:
@@ -69,7 +69,7 @@ def _head_sha():
 
 SHA = _head_sha()
 MAX_PER_24H = int(os.environ.get("MAX_PER_24H", "45"))  # spam kimi gorunmesin
-UA = {"User-Agent": "constara-instagram/1.0"}
+UA = {"User-Agent": "constara-automation/1.0"}
 
 
 class PostError(Exception):
