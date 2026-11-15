@@ -11,6 +11,8 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 const T = window.TL;
 const W = 1080, H = 1920;
@@ -60,6 +62,7 @@ function Hgt(x, z) {
   return h;
 }
 const crestY = x => Hgt(x, zp(x));
+window.__gy = crestY;
 
 // ---------------- render ----------------
 const canvas = document.getElementById('gl');
@@ -146,73 +149,74 @@ const terrainMat = new THREE.MeshStandardMaterial({ color: '#3a3530', roughness:
 const moon = new THREE.DirectionalLight('#a9bde0', 1.6); moon.position.set(-60, 90, -160); scene.add(moon); scene.add(moon.target);
 const hemi = new THREE.HemisphereLight('#2a3a58', '#0a0908', .7); scene.add(hemi);
 
-// ---------------- manekən ----------------
-const skin = new THREE.MeshPhysicalMaterial({ color: '#e7e1d6', roughness: .4, clearcoat: .35, clearcoatRoughness: .3, sheen: .3, sheenColor: new THREE.Color('#fff4e0') });
-const jointMat = new THREE.MeshPhysicalMaterial({ color: '#d8d0c2', roughness: .3, clearcoat: .6 });
-function lathe(profile, mat, sx = 1, sz = 1) {
-  const g = new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), 28); g.scale(sx, 1, sz);
-  const m = new THREE.Mesh(g, mat); m.castShadow = true; m.receiveShadow = true; return m;
+// ---------------- insan fiquru (Mixamo X Bot, mocap yerişi) ----------------
+// Bədən: real anatomiya (çiyin, əzələ, barmaqlar), material — fil sümüyü rəngli heykəl (üzsüz, «uncanny» yox).
+// Poza: mocap kliplər (idle/walk) + üstündən istiqamət-hədəfli düzəlişlər (aim): hər əza üçün personaj fəzasında istiqamət.
+const skin = new THREE.MeshPhysicalMaterial({ color: '#cfc7ba', roughness: .5, clearcoat: .25, clearcoatRoughness: .4, sheen: .4, sheenRoughness: .6, sheenColor: new THREE.Color('#fff1dc') });
+const seam = new THREE.MeshPhysicalMaterial({ color: '#c4bcae', roughness: .55, clearcoat: .2 });
+let GLTF = null, STRIDE = 1.4, HIP0 = 1.0;
+const CHILD = { Spine: 'Spine1', Spine1: 'Spine2', Spine2: 'Neck', Neck: 'Head', LeftArm: 'LeftForeArm', LeftForeArm: 'LeftHand', RightArm: 'RightForeArm', RightForeArm: 'RightHand',
+  LeftUpLeg: 'LeftLeg', LeftLeg: 'LeftFoot', LeftFoot: 'LeftToeBase', RightUpLeg: 'RightLeg', RightLeg: 'RightFoot', RightFoot: 'RightToeBase' };
+const ORDER = ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot', 'LeftArm', 'LeftForeArm', 'RightArm', 'RightForeArm'];
+function makeHuman() {
+  const model = SkeletonUtils.clone(GLTF.scene), root = new THREE.Group(); root.add(model); scene.add(root);
+  const B = {};
+  model.traverse(o => {
+    if (o.isBone) B[o.name.replace('mixamorig:', '').replace('mixamorig', '')] = o;
+    if (o.isMesh) { o.material = /Joint/i.test(o.name + o.material.name) ? seam : skin; o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false; }
+  });
+  const mixer = new THREE.AnimationMixer(model), A = {};
+  for (const c of GLTF.animations) { const a = mixer.clipAction(c); a.play(); a.setEffectiveWeight(0); A[c.name] = a; }
+  return { root, model, B, mixer, A };
 }
-function limb(r0, r1, len, mat = skin) {  // 0-dan -len-ə, uclar yumru
-  const pr = [];
-  for (let a = 0; a <= 6; a++) { const t = a / 6 * Math.PI / 2; pr.push([r0 * Math.sin(t) + 1e-4, r0 * Math.cos(t)]); }
-  for (let a = 0; a <= 6; a++) { const t = Math.PI / 2 + a / 6 * Math.PI / 2; pr.push([r1 * Math.sin(t) + 1e-4, -len + r1 * Math.cos(t)]); }
-  return lathe(pr, mat);
+const _q = new THREE.Quaternion(), _p = new THREE.Quaternion(), _r = new THREE.Quaternion(), _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), QI = new THREE.Quaternion();
+function rotWorld(bone, q) {  // dünya fırlanmasını sümüyün lokal fırlanmasına çevir
+  bone.parent.getWorldQuaternion(_p); _r.copy(_p).invert().multiply(q).multiply(_p); bone.quaternion.premultiply(_r); bone.updateWorldMatrix(false, true);
 }
-function ball(r, mat = jointMat, s = [1, 1, 1]) { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 20, 14), mat); m.scale.set(...s); m.castShadow = true; return m; }
-function G(parent, x = 0, y = 0, z = 0) { const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; }
-function makeFigure() {
-  const root = new THREE.Group(); scene.add(root);
-  const J = {};
-  root.add(lathe([[.0001, -.12], [.1, -.11], [.135, -.06], [.14, 0], [.125, .07], [.0001, .09]], skin, 1.22, .8));
-  J.spine = G(root, 0, .07, 0);
-  J.spine.add(lathe([[.0001, 0], [.115, .0], [.11, .08], [.125, .2], [.15, .33], [.162, .42], [.145, .5], [.09, .555], [.0001, .565]], skin, 1.25, .78));
-  J.neck = G(J.spine, 0, .55, .005); const nk = limb(.042, .046, .1); nk.rotation.x = Math.PI; nk.position.y = 0; J.neck.add(nk);
-  J.head = G(J.neck, 0, .1, .0); const hd = ball(.104, skin, [.9, 1.17, 1]); hd.position.set(0, .11, .012); J.head.add(hd);
-  for (const s of [-1, 1]) {
-    const k = s < 0 ? 'L' : 'R';
-    const sh = G(J.spine, s * .19, .47, 0); sh.add(ball(.056));
-    sh.add(limb(.052, .041, .29)); const el = G(sh, 0, -.3, 0); el.add(ball(.043)); el.add(limb(.041, .032, .25));
-    const hn = G(el, 0, -.265, 0); const hm = ball(.046, skin, [.62, 1.35, .42]); hm.position.y = -.05; hn.add(hm);
-    J['sh' + k] = sh; J['el' + k] = el; J['hand' + k] = hn;
-    const hp = G(root, s * .093, -.065, 0); hp.add(ball(.06));
-    hp.add(limb(.076, .054, .44)); const kn = G(hp, 0, -.445, 0); kn.add(ball(.052)); kn.add(limb(.053, .04, .42));
-    const an = G(kn, 0, -.43, 0); const ft = ball(.05, skin, [.82, .62, 2.25]); ft.position.set(0, -.04, .06); an.add(ft);
-    const m1 = G(an, 0, -.075, .0), m2 = G(an, 0, -.075, .16), m3 = G(kn, 0, .0, 0);
-    J['hip' + k] = hp; J['knee' + k] = kn; J['ank' + k] = an; J['fa' + k] = m1; J['fb' + k] = m2; J['kc' + k] = m3;
+function rotAxis(C, bone, axis, ang) { C.root.getWorldQuaternion(_q); _a.copy(axis).applyQuaternion(_q); rotWorld(bone, new THREE.Quaternion().setFromAxisAngle(_a, ang)); }
+function aim(C, name, dir, w) {
+  const bone = C.B[name], ch = C.B[CHILD[name]]; if (!bone || !ch || w <= 0) return;
+  bone.updateWorldMatrix(true, true); bone.getWorldPosition(_a); ch.getWorldPosition(_b); _b.sub(_a).normalize();
+  C.root.getWorldQuaternion(_q); _c.set(dir[0], dir[1], dir[2]).normalize().applyQuaternion(_q);
+  const q = new THREE.Quaternion().setFromUnitVectors(_b, _c); if (w < 1) q.slerpQuaternions(QI, q, w); rotWorld(bone, q);
+}
+// poza: { lean, twist, head, headY, side, L: { Bone: [x,y,z,w] } } — personaj fəzası: +z irəli, +y yuxarı, +x personajın solu
+function mixPose(a, b, u) {
+  const o = { L: {} };
+  for (const k of ['lean', 'twist', 'head', 'headY', 'side']) o[k] = lerp(a[k] || 0, b[k] || 0, u);
+  for (const k of new Set([...Object.keys(a.L || {}), ...Object.keys(b.L || {})])) {
+    const p = (a.L || {})[k], q = (b.L || {})[k], pd = p || q, qd = q || p;
+    const d = [lerp(pd[0], qd[0], u), lerp(pd[1], qd[1], u), lerp(pd[2], qd[2], u)];
+    o.L[k] = [...d, lerp(p ? (p[3] ?? 1) : 0, q ? (q[3] ?? 1) : 0, u)];
   }
-  return { root, J };
+  return o;
 }
-const POSE0 = { spine: 0, spineY: 0, spineZ: 0, neck: 0, head: 0, headY: 0, shL: 0, shLz: 0, elL: 0, shR: 0, shRz: 0, elR: 0, hipL: 0, kneeL: 0, ankL: 0, hipR: 0, kneeR: 0, ankR: 0, hipLz: 0, hipRz: 0 };
-function mix(a, b, u) { const o = {}; for (const k in POSE0) o[k] = lerp(a[k] ?? 0, b[k] ?? 0, u); return o; }
-function applyPose(F, p) {
-  const J = F.J;
-  J.spine.rotation.set(p.spine, p.spineY, p.spineZ); J.neck.rotation.x = p.neck; J.head.rotation.set(p.head, p.headY, 0);
-  J.shL.rotation.set(p.shL, 0, -.08 - p.shLz); J.elL.rotation.x = p.elL;
-  J.shR.rotation.set(p.shR, 0, .08 + p.shRz); J.elR.rotation.x = p.elR;
-  J.hipL.rotation.set(p.hipL, 0, -p.hipLz); J.kneeL.rotation.x = p.kneeL; J.ankL.rotation.x = p.ankL;
-  J.hipR.rotation.set(p.hipR, 0, p.hipRz); J.kneeR.rotation.x = p.kneeR; J.ankR.rotation.x = p.ankR;
+const AX = new THREE.Vector3(1, 0, 0), AY = new THREE.Vector3(0, 1, 0), AZ = new THREE.Vector3(0, 0, 1);
+function applyHuman(C, anim, pose) {
+  for (const k in C.A) { const a = C.A[k], w = anim[k] ? anim[k][0] : 0; a.setEffectiveWeight(w); a.enabled = w > 0; if (anim[k]) a.time = anim[k][1] % a.getClip().duration; }
+  C.mixer.update(0);
+  C.root.updateMatrixWorld(true);
+  if (pose.lean || pose.twist || pose.side) for (const n of ['Spine', 'Spine1', 'Spine2']) {
+    if (pose.lean) rotAxis(C, C.B[n], AX, pose.lean / 3); if (pose.twist) rotAxis(C, C.B[n], AY, pose.twist / 3); if (pose.side) rotAxis(C, C.B[n], AZ, pose.side / 3);
+  }
+  if (pose.head) { rotAxis(C, C.B.Neck, AX, pose.head * .35); rotAxis(C, C.B.Head, AX, pose.head * .65); }
+  if (pose.headY) rotAxis(C, C.B.Head, AY, pose.headY);
+  for (const n of ORDER) if (pose.L && pose.L[n]) aim(C, n, pose.L[n], pose.L[n][3] ?? 1);
+  if (pose.grip) grip(C, pose.grip);
 }
-const _v = new THREE.Vector3();
-function ground(F, extra = []) {  // ən aşağı ayaq nöqtəsini relyefə oturt
-  F.root.updateMatrixWorld(true);
+function grip(C, w) {  // sağ əl: barmaqları fənərin sapına bük
+  for (const f of ['Index', 'Middle', 'Ring', 'Pinky']) for (let i = 1; i <= 3; i++) { const b = C.B['RightHand' + f + i]; if (b) b.rotateZ(-1.0 * w * (i === 1 ? .8 : 1)); }
+  for (let i = 2; i <= 3; i++) { const b = C.B['RightHandThumb' + i]; if (b) b.rotateZ(-.5 * w); }
+  C.B.RightHand.updateWorldMatrix(false, true);
+}
+function groundHuman(C, extra = []) {
+  C.root.updateMatrixWorld(true);
   let best = 1e9;
-  for (const o of ['faL', 'fbL', 'faR', 'fbR', ...extra]) { o.getWorldPosition ? o.getWorldPosition(_v) : F.J[o].getWorldPosition(_v); best = Math.min(best, _v.y - Hgt(_v.x, _v.z)); }
-  F.root.position.y -= best; F.root.updateMatrixWorld(true);
+  for (const [n, off] of [['LeftToeBase', .025], ['RightToeBase', .025], ['LeftFoot', .075], ['RightFoot', .075], ...extra]) {
+    C.B[n].getWorldPosition(_a); best = Math.min(best, _a.y - off - Hgt(_a.x, _a.z));
+  }
+  C.root.position.y -= best; C.root.updateMatrixWorld(true);
 }
-function walkPose(ph, amp, lean, lantern) {
-  const s = Math.sin(ph), c = Math.cos(ph);
-  const p = { ...POSE0 };
-  p.hipL = -.42 * s * amp; p.hipR = .42 * s * amp;
-  p.kneeL = .08 + amp * (.78 * Math.pow(Math.max(0, c), 1.3) + .1 * Math.max(0, -s));
-  p.kneeR = .08 + amp * (.78 * Math.pow(Math.max(0, -c), 1.3) + .1 * Math.max(0, s));
-  p.ankL = -(p.hipL + p.kneeL) * .55 + .05; p.ankR = -(p.hipR + p.kneeR) * .55 + .05;
-  p.shL = .34 * s * amp; p.elL = -.18 - .22 * amp * Math.max(0, -s);
-  p.shR = lantern ? -.22 - .04 * s * amp : -.34 * s * amp; p.shRz = lantern ? .1 : 0; p.elR = lantern ? -.32 : -.18 - .22 * amp * Math.max(0, s);
-  p.spine = .06 + lean; p.spineY = .07 * s * amp; p.head = -.04 - lean * .5; p.hipLz = .02; p.hipRz = .02;
-  return p;
-}
-
 // ---------------- fənər ----------------
 function makeLantern() {
   const g = new THREE.Group(); scene.add(g);
@@ -335,7 +339,7 @@ trailMat2.resolution.set(W, H);
 const trail2 = new Line2(trailGeo, trailMat2); scene.add(trail2);
 
 // ---------------- personajlar ----------------
-const ST = makeFigure(), PL = makeFigure();
+let ST = null, PL = null;
 const lant = makeLantern();
 const lantHalo = sprite(new THREE.Color('#ffb466'), .8, true, .35), lantGlint = sprite(new THREE.Color('#ffcf8a'), .05, false, 1);
 const PEAK = new THREE.Vector3(T.peak, crestY(T.peak) + 2.6, zp(T.peak));
@@ -356,60 +360,84 @@ const dayAt = t => { const D = T.days; if (t <= D[0][0]) return D[0][1]; for (le
 const SCORE_K = T.score / (crestY(XEND) - crestY(0));
 const scoreAt = x => Math.round((crestY(x) - crestY(0)) * SCORE_K);
 
+// pozalar (personaj fəzası: +z irəli, +x personajın solu)
+const P_LANTERN = { grip: .9, L: { RightArm: [-.33, -.92, .18], RightForeArm: [-.3, -.62, .72] } };
+const P_LOOKLAMP = { grip: .9, head: .15, L: { RightArm: [-.25, -.55, .8], RightForeArm: [.15, .3, .95] } };
+const P_TRIP = { lean: .75, head: .1, grip: .9, L: { LeftArm: [.2, -.25, 1], LeftForeArm: [.1, -.25, 1], RightArm: [-.3, -.45, .85], RightForeArm: [-.1, -.6, .8],
+  LeftUpLeg: [0, -.85, .55], LeftLeg: [0, -1, .05], RightUpLeg: [0, -.8, -.55], RightLeg: [0, -.55, -.85] } };
+const P_KNEEL = { lean: .42, head: .38, grip: .9, L: { LeftArm: [.15, -.85, .45], LeftForeArm: [.05, -.95, .3], RightArm: [-.18, -.9, .3], RightForeArm: [-.05, -.75, .65],
+  LeftUpLeg: [.06, -.12, 1], LeftLeg: [0, -1, -.06], LeftFoot: [0, -.25, 1], RightUpLeg: [-.02, -1, -.08], RightLeg: [0, -.1, -1], RightFoot: [0, -.55, -.85] } };
+const P_RAISE = { lean: -.06, head: -.32, grip: .9, L: { RightArm: [-.2, 1, .2], RightForeArm: [-.06, 1, .15], LeftArm: [.12, -1, .05], LeftForeArm: [.05, -1, .15] } };
 function poseStarter(t) {
   const x = xsAt(t), sp = (xsAt(t + .05) - xsAt(t - .05)) / .1;
-  const amp = clamp(sp / 1.1) * (sp < 3 ? 1 : 0);   // sürətli zaman-sıçrayışında (kəsim xaricində) adi yeriş
-  const x2 = x + .3, slope = Math.atan2(crestY(x2) - crestY(x - .3), .6);
-  const lit = t > T.ignite;
-  let p = walkPose(x / 1.45 * Math.PI * 2, amp, clamp(slope * .5, -.1, .3), lit);
-  // Day 1: yuxarı (mayaka) baxır, fənəri qaldırır
-  const look = 1 - seg(t, 2.6, 3.1);
-  p.head -= .42 * look; p.neck -= .1 * look;
-  if (t < T.ignite + .4) { const u = seg(t, T.ignite - .5, T.ignite) * (1 - seg(t, T.ignite + .2, T.ignite + .6)); p.shR = lerp(p.shR, -1.05, u); p.elR = lerp(p.elR, -.7, u); }
+  const amp = clamp(sp / 1.0), slope = Math.atan2(crestY(x + .3) - crestY(x - .3), .6);
+  const walkT = x / STRIDE * ST.A.walk.getClip().duration;
+  const anim = { walk: [amp, walkT], idle: [1 - amp, t * .9] };
+  let pose = { lean: clamp(slope * .6, -.1, .35) * amp, ...JSON.parse(JSON.stringify(P_LANTERN)) };
+  pose.lean = clamp(slope * .6, -.1, .35) * amp;
+  // Day 1: mayaka baxır; fənəri qaldırıb yandırır
+  const look = 1 - seg(t, 2.7, 3.2); pose.head = (pose.head || 0) - .38 * look;
+  const lu = seg(t, T.ignite - .55, T.ignite - .1) * (1 - seg(t, T.ignite + .25, T.ignite + .75));
+  if (lu > 0) pose = mixPose(pose, P_LOOKLAMP, eio(lu));
   // büdrəmə
-  const [s0, s1] = T.stumble; const su = (t - s0) / (s1 - s0);
+  const [s0, s1] = T.stumble, su = (t - s0) / (s1 - s0);
   if (su > 0 && su < 1) {
-    const trip = { ...POSE0, spine: .75, head: .2, shL: -1.25, elL: -.25, shR: -.6, shRz: .3, elR: -.2, hipL: -.75, kneeL: .5, ankL: .2, hipR: .55, kneeR: 1.0, ankR: .3 };
-    const kneel = { ...POSE0, spine: .48, head: .42, neck: .15, shL: -.55, shLz: .05, elL: -.1, shR: -.35, shRz: .2, elR: -.4, hipL: -1.45, kneeL: 1.65, ankL: -.15, hipR: .1, kneeR: 1.62, ankR: .6 };
-    const w = walkPose(x / 1.45 * Math.PI * 2, 1, .1, true);
-    if (su < .2) p = mix(w, trip, eio(su / .2));
-    else if (su < .38) p = mix(trip, kneel, eio((su - .2) / .18));
-    else if (su < .68) { p = kneel; p.head = .42 - .25 * seg(su, .5, .68); }
-    else p = mix(kneel, w, eio((su - .68) / .32));
+    if (su < .2) pose = mixPose(pose, P_TRIP, eio(su / .2));
+    else if (su < .38) pose = mixPose(P_TRIP, P_KNEEL, eio((su - .2) / .18));
+    else if (su < .68) { pose = mixPose(P_KNEEL, P_KNEEL, 0); pose.head = .38 - .3 * seg(su, .5, .68); }
+    else pose = mixPose(P_KNEEL, pose, eio((su - .68) / .32));
+    anim.walk[0] = su < .2 ? 1 - su / .2 : su > .68 ? (su - .68) / .32 : 0; anim.idle[0] = 1 - anim.walk[0];
   }
-  // zirvə: fənəri yuxarı qaldırır
-  const up = seg(t, T.raise, T.raise + .9);
-  if (up > 0) { const r = { ...POSE0, shR: -2.75, shRz: .15, elR: -.15, shL: .05, head: -.25, spine: -.04 }; p = mix(p, r, eio(up)); }
-  const y0 = crestY(x), z0 = zp(x), dir = Math.atan2(1, zp(x + .5) - zp(x - .5));
-  ST.root.position.set(x, y0 + 1.0, z0); ST.root.rotation.set(0, dir, 0);
-  applyPose(ST, p);
-  ground(ST, su > 0 && su < 1 ? ['kcL', 'kcR'] : []);
+  const up = seg(t, T.raise, T.raise + 1.0);
+  if (up > 0) pose = mixPose(pose, P_RAISE, eio(up));
+  pose.grip = .9;
+  const dir = Math.atan2(1, zp(x + .5) - zp(x - .5));
+  ST.root.position.set(x, crestY(x), zp(x)); ST.root.rotation.set(0, dir, 0);
+  applyHuman(ST, anim, pose);
+  groundHuman(ST, su > 0 && su < 1 ? [['LeftLeg', .055], ['RightLeg', .055]] : []);
   return { x, sp, su };
 }
+const P_SIT = { lean: .5, head: .45, L: { LeftUpLeg: [.14, -.1, 1], LeftLeg: [.03, -1, .1], LeftFoot: [0, -.3, 1], RightUpLeg: [-.14, -.1, 1], RightLeg: [-.03, -1, .1], RightFoot: [0, -.3, 1],
+  LeftArm: [.28, -.55, .78], LeftForeArm: [-.3, -.2, .93], RightArm: [-.22, -.55, .8], RightForeArm: [.12, -.28, .95] } };
+const LEGS = Object.fromEntries(Object.entries(P_SIT.L).filter(([k]) => /Leg|Foot/.test(k)));
+const P_CRUMPLE = { lean: .25, head: .35, L: { ...LEGS, LeftArm: [.1, -.65, .75], LeftForeArm: [-.85, .15, .5], RightArm: [-.1, -.65, .75], RightForeArm: [.85, .15, .5] } };
+const P_THROW = { lean: .15, twist: -.4, head: .05, headY: -.5, L: { ...LEGS, LeftArm: [.15, -.7, .6], LeftForeArm: [-.6, -.1, .8], RightArm: [-.95, .15, -.15], RightForeArm: [-.9, .35, -.1] } };
+const P_LOOKUP = { lean: .02, head: -.62, headY: .1, L: { ...LEGS, RightArm: [-.2, -.7, .65], RightForeArm: [.2, -.35, .9] } };
 function posePlanner(t) {
-  let p = { ...POSE0, spine: .38, neck: .08, head: .36, hipL: -1.5, kneeL: 1.55, ankL: -.05, hipR: -1.45, kneeR: 1.5, ankR: -.05, hipLz: .07, hipRz: .07,
-    shL: -.95, shLz: -.12, elL: -.75, shR: -.9, shRz: -.05, elR: -.85 };
+  let pose = JSON.parse(JSON.stringify(P_SIT));
   // çəkir
-  p.shR += .07 * Math.sin(t * 9) + .04 * Math.sin(t * 23); p.shRz += .08 * Math.sin(t * 4.3); p.headY = .05 * Math.sin(t * 1.3);
-  // Day 1: mayaka baxır
-  const look0 = 1 - seg(t, 2.4, 3.6); p.spine = lerp(p.spine, .02, look0); p.head = lerp(p.head, -.4, look0); p.shR = lerp(p.shR, -.55, look0); p.shL = lerp(p.shL, -.55, look0);
-  // kağızı əzib atır
+  const d = pose.L.RightForeArm; d[0] += .1 * Math.sin(t * 9) + .05 * Math.sin(t * 23); d[2] += .06 * Math.sin(t * 4.3); pose.headY = .06 * Math.sin(t * 1.3);
+  const look0 = 1 - seg(t, 2.4, 3.6); pose.lean = lerp(pose.lean, .05, look0); pose.head = lerp(pose.head, -.35, look0);
   for (const rt of T.tosses) {
     const u = (t - (rt - .75)) / 1.15; if (u <= 0 || u >= 1) continue;
-    const crum = { ...p, shL: -.75, shLz: -.42, elL: -1.55, shR: -.75, shRz: -.4, elR: -1.55, spine: .2, head: .25 };
-    const thr = { ...p, shL: -.6, shLz: -.2, elL: -1.0, shR: -.35, shRz: .95, elR: -.25, spine: .12, spineY: -.25, head: .1, headY: -.5 };
-    if (u < .3) p = mix(p, crum, eio(u / .3)); else if (u < .55) { p = { ...crum }; p.elL += .08 * Math.sin(u * 60); p.elR -= .08 * Math.sin(u * 60); }
-    else if (u < .72) p = mix(crum, thr, eio((u - .55) / .17)); else p = mix(thr, p, eio((u - .72) / .28));
+    const base = pose;
+    if (u < .3) pose = mixPose(base, P_CRUMPLE, eio(u / .3));
+    else if (u < .55) { pose = mixPose(base, P_CRUMPLE, 1); pose.L.LeftForeArm[1] += .1 * Math.sin(u * 60); }
+    else if (u < .72) pose = mixPose(mixPose(base, P_CRUMPLE, 1), mixPose(base, P_THROW, 1), eio((u - .55) / .17));
+    else pose = mixPose(mixPose(base, P_THROW, 1), base, eio((u - .72) / .28));
   }
-  // G: başını qaldırıb dağdakı işığa baxır
-  const lk = seg(t, T.lookup, T.lookup + .8);
-  if (lk > 0) { p.spine = lerp(p.spine, .05, eio(lk)); p.head = lerp(p.head, -.62, eio(lk)); p.neck = lerp(p.neck, -.1, eio(lk)); p.headY = lerp(p.headY, -.12, eio(lk)); p.shR = lerp(p.shR, -.7, eio(lk)); p.elR = lerp(p.elR, -1.0, eio(lk)); }
-  PL.root.position.set(DESK.x - .95, .76, DESK.z); PL.root.rotation.set(0, Math.PI / 2, 0);
-  applyPose(PL, p);
-  PL.root.updateMatrixWorld(true);
+  const lk = seg(t, T.lookup, T.lookup + .9); if (lk > 0) pose = mixPose(pose, P_LOOKUP, eio(lk));
+  PL.root.position.set(DESK.x - .98, 0, DESK.z); PL.root.rotation.set(0, Math.PI / 2, 0);
+  applyHuman(PL, { idle: [1, 1.3 + t * .7] }, pose);
+  PL.B.Hips.getWorldPosition(_a); PL.root.position.y += .74 - _a.y; PL.root.updateMatrixWorld(true);
 }
-
-for (const b of BALLS) { posePlanner(b.rt); b.start = new THREE.Vector3(); PL.J.handR.getWorldPosition(b.start); }
+function initHumans(gltf) {
+  GLTF = gltf;
+  ST = makeHuman(); PL = makeHuman();
+  // ölçü: 1.78 m
+  ST.A.idle.setEffectiveWeight(1); ST.mixer.update(0); ST.root.updateMatrixWorld(true);
+  const bb = new THREE.Box3().setFromObject(ST.model), s = 1.78 / (bb.max.y - bb.min.y);
+  ST.model.scale.multiplyScalar(s); PL.model.scale.multiplyScalar(s);
+  // addım uzunluğu: dayaq fazasında ayağın geri sürüşmə sürəti × dövr müddəti
+  const wa = ST.A.walk, dur = wa.getClip().duration; let best = null;
+  for (let i = 0; i < 60; i++) {
+    const tt = i / 60 * dur; applyHuman(ST, { walk: [1, tt] }, {}); ST.B.LeftFoot.getWorldPosition(_a); const y = _a.y, z0 = _a.z;
+    applyHuman(ST, { walk: [1, tt + .02] }, {}); ST.B.LeftFoot.getWorldPosition(_a);
+    if (!best || y < best[0]) best = [y, Math.abs(_a.z - z0) / .02];
+  }
+  STRIDE = clamp(best[1] * dur, .9, 2.2);
+  for (const b of BALLS) { posePlanner(b.rt); b.start = new THREE.Vector3(); PL.B.RightHand.getWorldPosition(b.start); }
+}
 
 // ---------------- kamera ----------------
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -431,7 +459,7 @@ function cam(t, st) {
     pos = V(10.9 + 2.5 + u * .7, crestY(11) + 1.05, zp(11) + 3.0); tgt = V(lerp(10.3, 11.6, ease(seg(t, 7.0, 8.4))), crestY(11) + .55, zp(11)); fov = 40; fog = .012;
   } else if (sh === 'E') { // Planner, çiynin üstündən
     const u = ease(seg(t, 9.4, 11.8));
-    pos = V(DESK.x - 2.25 + u * .25, 1.95, DESK.z + .95 - u * .1); tgt = V(DESK.x - .1, .85, DESK.z + .05); fov = 44; fog = .02;
+    pos = V(DESK.x - 2.75 + u * .25, 2.2, DESK.z + 1.35 - u * .1); tgt = V(DESK.x - .2, .9, DESK.z + .05); fov = 42; fog = .02;
   } else if (sh === 'F') { // dron: arxadan qalxır, iz aşağıda qıvrılır
     const u = ease(seg(t, 11.8, 14.8));
     pos = V(x - lerp(4.0, 7.5, u), y + lerp(1.4, 5.5, u), z + lerp(3.6, 7.5, u)); tgt = V(x + .8, y + lerp(.9, .2, u), z); fov = 42; fog = .009;
@@ -445,6 +473,7 @@ function cam(t, st) {
     const lift = Math.sin(Math.PI * u) * 10;
     pos = p0.clone().lerp(p1, u); pos.y += lift; tgt = t0.clone().lerp(t1, ease(seg(t, 17.2, 19.4))); fov = lerp(50, 58, u); fog = lerp(.005, .0011, u);
   }
+  if (window.__dbg) { const d = window.__dbg(t, st); pos = V(...d.pos); tgt = V(...d.tgt); fov = d.fov || 35; fog = .01; }
   const close = sh === 'A' || sh === 'H' ? .02 : .035;
   pos.add(shake(t, close)); camera.position.copy(pos); camera.fov = fov; camera.updateProjectionMatrix(); camera.lookAt(tgt);
   scene.fog.density = fog;
@@ -527,12 +556,12 @@ window.draw = function (t) {
   const st = poseStarter(t); posePlanner(t);
   const sh = cam(t, st);
   // fənər: əldə asılır, yırğalanır
-  const hand = new THREE.Vector3(); ST.J.handR.getWorldPosition(hand);
+  const hand = new THREE.Vector3(); ST.B.RightHand.getWorldPosition(hand); ST.B.RightHandMiddle1.getWorldPosition(_b); hand.lerp(_b, .8);
   const sw = (st.sp > 3 ? 0 : .12 * Math.sin(t * 5.4)) + (st.su > 0 && st.su < 1 ? .6 * Math.sin(st.su * 14) * (1 - st.su) : 0);
   lant.g.position.copy(hand).add(V(0, -.07, 0)); lant.g.rotation.set(0, 0, sw);
   const on = seg(t, T.ignite, T.ignite + .25) * (1 + .5 * Math.exp(-Math.pow((t - T.ignite - .15) / .12, 2)));
   const flick = 1 + .07 * Math.sin(t * 31) * Math.sin(t * 17.3) + .04 * Math.sin(t * 53);
-  lant.light.intensity = 1.1 * on * flick; lant.glassMat.emissiveIntensity = 1.6 * on * flick; lant.flame.visible = on > .02;
+  lant.light.intensity = .75 * on * flick; lant.glassMat.emissiveIntensity = 1.6 * on * flick; lant.flame.visible = on > .02;
   const lw = new THREE.Vector3(); lant.light.getWorldPosition(lw);
   lantHalo.position.copy(lw); lantHalo.material.opacity = .3 * on * flick; lantGlint.position.copy(lw); lantGlint.material.opacity = on * (sh === 'H' || sh === 'G' || sh === 'A' ? 1 : .0);
   lantGlint.scale.setScalar(sh === 'H' ? .028 : .04);
@@ -579,5 +608,6 @@ window.draw = function (t) {
   labels(t, sh, st); hud(t, sh, st); caption(t);
   if (t >= T.end) { const a = seg(t, T.end + .6, T.end + 1.1); X.save(); X.globalAlpha = a; X.fillStyle = 'rgba(225,220,205,.92)'; X.font = '34px MO'; X.letterSpacing = '6px'; X.textAlign = 'center'; X.shadowColor = 'rgba(0,0,0,.9)'; X.shadowBlur = 10; X.fillText('@constara.app', W / 2 + 3, 1790); X.restore(); }
 };
-document.fonts.ready.then(() => { window.draw(0); window.READY = true; });
+const glb = Uint8Array.from(atob(window.XBOT), c => c.charCodeAt(0)).buffer;
+new GLTFLoader().parse(glb, '', g => { initHumans(g); document.fonts.ready.then(() => { window.draw(0); window.READY = true; }); }, e => console.error('GLB', e));
 ['MO', 'IB'].forEach(f => document.fonts.load('40px ' + f));

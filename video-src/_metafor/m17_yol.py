@@ -5,7 +5,8 @@ daha gerçəkçi, premium görünüşlü animasiya». Hekayə eyni (pis planla b
 (WebGL, fiziki işıq, kölgə, duman, bloom, film dənəsi), manekən fiqurlar, real relyef. Starter fənərlə dağ silsiləsinə qalxır,
 ayağının altındakı iz işıqlanır; Planner masa lampası altında plan çəkib atır (PLAN vN). Sonda kamera geri çəkilir:
 silsilənin profili + qızılı iz = Constara qrafiki (iki −5 enişi), aşağıda Planner-in lampası «0».
-Asılılıq: _build/node_modules (npm i --prefix _build three@0.170.0 esbuild@0.24.0), scipy (səs).
+Asılılıq: _build/node_modules (npm i --prefix _build three@0.170.0 esbuild@0.24.0), scipy (səs),
+_build/models/Xbot.glb (three.js r170 examples/models/gltf/Xbot.glb — Mixamo X Bot, idle/walk mocap).
 İşlətmə: python3 m17_yol.py <scratch> [--no-audio] [--tts <kokoro qovluğu>]
          önizləmə: python3 onizleme.py <scratch> <out.html> (sonra m17_yol.py --fix-preview <out.html>)
          kadrlar: cp render3d.mjs <scratch>/ ; node render3d.mjs <scratch>   (WebGL üçün swiftshader bayraqları)
@@ -180,16 +181,22 @@ def bundle():
 def run(scr):
     os.makedirs(scr, exist_ok=True)
     html = open(os.path.join(HERE, 'm17_scene.html')).read()
-    html = html.replace('/*TL*/', 'window.TL=' + json.dumps(TL) + ';').replace('/*BUNDLE*/', bundle().replace('</script', '<\\/script'))
+    import base64
+    xbot = base64.b64encode(open(os.path.join(HERE, '_build', 'models', 'Xbot.glb'), 'rb').read()).decode()
+    html = html.replace('/*TL*/', 'window.TL=' + json.dumps(TL) + ';window.XBOT="' + xbot + '";').replace('/*BUNDLE*/', bundle().replace('</script', '<\\/script'))
     open(os.path.join(scr, 'index.html'), 'w').write(html)
     if '--no-audio' not in sys.argv:
         audio(os.path.join(scr, 'audio.wav'))
     print('hazır:', scr)
 
 
-def fix_preview(p):  # onizleme.py-dən sonra: səhnəni ekrana sığdır
-    h = open(p).read().replace('#stage{position:relative;width:1080px;height:1920px}',
-                               '#stage{position:relative;height:calc(100vh - 70px);aspect-ratio:9/16;max-width:100vw}#stage canvas{border-radius:8px}')
+def fix_preview(p):  # onizleme.py-dən sonra: WebGL səhnəsi gizli 1080×1920-də çəkilir, hər kadr 2D «view» kanvasına köçürülür
+    h = open(p).read()     # (WebGL kanvasını birbaşa kiçiltmək bəzi brauzerlərdə qara ekran verir)
+    fit = ('<canvas id="view" width="1080" height="1920" style="display:block;height:calc(100vh - 70px);width:auto;max-width:100vw;aspect-ratio:9/16;border-radius:8px"></canvas>'
+           '<script>(function(){const w=document.getElementById("wrap");w.style.cssText="position:fixed;left:-3000px;top:0;width:1080px;height:1920px;overflow:hidden";'
+           'const v=document.getElementById("view").getContext("2d"),g=document.getElementById("gl"),o=document.getElementById("ov"),d=window.draw;'
+           'window.draw=function(t){d(t===0?1.2:t);v.drawImage(g,0,0);v.drawImage(o,0,0);};})();</script>')
+    h = h.replace('<div id="bar">', fit + '<div id="bar">', 1)
     open(p, 'w').write(h); print('önizləmə düzəldildi:', p)
 
 
