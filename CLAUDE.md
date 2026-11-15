@@ -35,6 +35,8 @@ Constara tətbiqinin sosial şəbəkə avtomatlaşdırması. Hazırda **@constar
 - **RƏDD edilənlər:** 3D (three.js, manekən/X Bot — «adama oxşamır», «3d istəmirəm»); çubuq fiqurlar artıq zəif sayılır. Yeni metaforları bu 2D mühərriklə qur (personaj/səhnə funksiyalarını təkrar istifadə et).
 - **M17 «Yol» 2D paylaşıldı** 2026-11-15 12:42 TR: IG https://www.instagram.com/reel/Dfwe4YJDerk/ · FB https://www.facebook.com/reel/29699747562942723/
 - **M18 «Alqış»** (11-15, `m18_alqis.py` + `m18_scene2d.html`): izdiham güllür → unudur (telefonlar) → zirvədə şəfəq → alqış; «Same people. Different view.» Yenilik: izdiham (güzgü/ölçü/saç variantları), şəfəq+günəş rim, baloncuklar, sintetik alqış. Paylaşıldı 15:02 TR: IG https://www.instagram.com/reel/Dfwu7I5iYKo/ · FB https://www.facebook.com/reel/1608902817094394/
+- **M19 «Göl»** (11-15, `m19_gol.py` + `m19_scene.html`): M14-ün bölünmüş ekranı (1.2K baxış!) + insan siluetləri — THE SWIMMER vs THE READER. Paylaşıldı 19:02 TR: IG https://www.instagram.com/reel/DfxKZc5CCYe/ · FB https://www.facebook.com/reel/1934172024225034/
+- **İstifadəçi qaydası (11-15):** dirsəklər/dizlər tərs olmasın — `solve()`-də bazu ≤20° arxaya limiti; krol qolu: faza həmişə irəli. Yeni pozada qolları yaxından yoxla.
 - Fon: M14 «Fənər» (Starter vs Planner) 130 tavanını keçən ilk metafor oldu (219 baxış, ikinci dalğa) → «X vs Y qarşıdurma + sayğac + sonda açılış» quruluşu.
 
 ## ⭐ YALNIZ METAFOR ÜSLUBU (istifadəçi, 2026-11-13 16:36, ƏN ÜSTÜN QAYDA)
