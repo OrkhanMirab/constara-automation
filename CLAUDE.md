@@ -33,7 +33,7 @@ Constara tətbiqinin sosial şəbəkə avtomatlaşdırması. Hazırda **@constar
 
 ## ▶️ YouTube Shorts avtomatik (2026-11-15, qurulur)
 - Google Cloud layihəsi `constara-youtube` (istifadəçinin şəxsi hesabında), YouTube Data API v3 ✅, OAuth External **In production** ✅ (logo YOX — logo verification tələb edir), Branding: home/privacy/terms = Constara saytı (`/privacy.html`, `/terms.html`), domen `life-analytics-jade.vercel.app`. Client «constara-uploader» (Web, redirect OAuth Playground). Token Constara kanalının hesabı ilə, scope yalnız `youtube.upload`.
-- Secrets: `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` ✅ (11-15 qoyuldu). İlk real sınaq: M19 `queue/2026-11-15-yt-test-m19` (yalnız youtube). Repo variable `YT_PRIVACY` (susmaya görə `private`).
+- Secrets: `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` ✅ (11-15 qoyuldu). İlk real sınaq ✅ 11-15 19:57 TR: M19 → https://www.youtube.com/shorts/tvJkWzVdObA (private, işləyir). 20:30 M07-dən etibarən hər Reels avtomatik YouTube-a da gedir. Repo variable `YT_PRIVACY` (susmaya görə `private`).
 - Kod: `paylas.py` `publish_youtube` — yalnız reels, secret-lər varsa avtomatik platformaya düşür (açıq `platforms` siyahısında yoxdursa getmir). Başlıq = `yt_title` və ya caption-un 1-ci sətri + `#Shorts` (≤100), açıqlama = caption (linksiz), Made for kids = false.
 - **Audit gözlənilir:** auditsiz layihədə API yükləmələri **private** qalır → istifadəçi Studio-da public edir/schedule qoyur (gündə 1–2, birdən çox açmasın). Növbəti: YouTube API Services audit formu (privacy səhifəsinə YouTube API + Google Privacy Policy linki əlavə olunmalı — Constara sessiyasında), təsdiqdən sonra `YT_PRIVACY=public`.
 
