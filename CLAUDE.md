@@ -33,6 +33,7 @@ Constara tətbiqinin sosial şəbəkə avtomatlaşdırması. Hazırda **@constar
 - Nümunə/mühərrik: **M17 «Yol» 2D** — `video-src/_metafor/m17_scene2d.html` + `m17_yol2d.py` (TL/səs/diktor `m17_yol.py`-dan). Render: `python3 m17_yol2d.py <scr> --tts /home/user/kokoro` (səs) → `cp render.mjs <scr>/` → `NODE_PATH=$(npm root -g) node render.mjs <scr>` (~4 dəq, 780 kadr) → ffmpeg `-crf 25 -maxrate 3.5M -bufsize 7M` (~7 MB; dənə səbəbindən crf 20 = 26 MB). Önizləmə: `onizleme.py` (1 MB, telefonda açılır).
 - Üslub: gecə, **real insan siluetləri yan görünüşdə** (profil üz, bədən forması, çəkmə, aksesuar: çanta/papaq/eynək), **rim işıq** (isti fənər/soyuq lampa/ay; `litFigure`), IK yeriş (ayaq sürüşmür), qat-qat dağlar, ulduz/ay, dənə+vinyet, kəsimli kadrlar (geniş → yaxın → geniş), sonda geri çəkilmə ilə «mənzərə = Constara qrafiki». Mətn: yuxarıda monospace caption + DAY/SCORE HUD, diktor am_michael 0.92, CTA «Send this to…» + `@constara.app`.
 - **RƏDD edilənlər:** 3D (three.js, manekən/X Bot — «adama oxşamır», «3d istəmirəm»); çubuq fiqurlar artıq zəif sayılır. Yeni metaforları bu 2D mühərriklə qur (personaj/səhnə funksiyalarını təkrar istifadə et).
+- **M17 «Yol» 2D paylaşıldı** 2026-11-15 12:42 TR: IG https://www.instagram.com/reel/Dfwe4YJDerk/ · FB https://www.facebook.com/reel/29699747562942723/
 - Fon: M14 «Fənər» (Starter vs Planner) 130 tavanını keçən ilk metafor oldu (219 baxış, ikinci dalğa) → «X vs Y qarşıdurma + sayğac + sonda açılış» quruluşu.
 
 ## ⭐ YALNIZ METAFOR ÜSLUBU (istifadəçi, 2026-11-13 16:36, ƏN ÜSTÜN QAYDA)
