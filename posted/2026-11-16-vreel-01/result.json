@@ -1,0 +1,16 @@
+{
+  "instagram": {
+    "error": "video upload -> HTTP 400: {\"debug_info\":{\"retriable\":false,\"type\":\"ProcessingFailedError\",\"message\":\"Request processing failed\"}}"
+  },
+  "facebook": {
+    "video_id": "1843181800466423",
+    "permalink": "https://www.facebook.com/reel/1843181800466423/"
+  },
+  "youtube": {
+    "video_id": "ocE1VBRuE5k",
+    "permalink": "https://www.youtube.com/shorts/ocE1VBRuE5k",
+    "title": "You don't have no time. You have 4 hours a night on your phone. 🧱 #Shorts",
+    "privacy": "private"
+  },
+  "posted_at": "2026-11-16T10:01:15.080491+00:00"
+}
