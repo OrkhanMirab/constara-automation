@@ -4,6 +4,13 @@ Constara tətbiqinin sosial şəbəkə avtomatlaşdırması. Hazırda **@constar
 
 > **Repo adı 2026-11-15-də `constara-instagram` → `constara-automation` dəyişdi** (GitHub köhnə linkləri yönləndirir; secret-lər/Actions eynidir). Köhnə sessiyalarda qovluq `/home/user/constara-instagram` ola bilər.
 
+## 🛑 MUTLƏQ QAYDA #1 (istifadəçi 11-16: «göstərməmiş mp4-ə çevirmə… kəskin qayda qoy») — HƏR ŞEYDƏN ÜSTÜN
+**YENİ TİP / YENİ FORMAT / YENİ SSENARİ quruluşu olan heç bir video istifadəçiyə CANLI HTML önizləmə göstərilmədən və «render et / olar» cavabı alınmadan MP4-ə render EDİLMİR və plana YAZILMIR.**
+- Addımlar: ssenari (qısa) → `python3 video-src/_metafor/onizleme.py <scratch> <out.html>` → SendUserFile display=render → **CAVAB GÖZLƏ**. Fonda da render başlatma.
+- Gecə işçisi: yeni tipin önizləməsini göndərir və o slotu **sübut olunmuş formatla** (bölünmüş ekran) doldurur. Yeni tip yalnız təsdiqdən SONRA növbəti günün planına düşür.
+- «Avtomatik plan bu qaydaya düşmür» istisnası yeni tiplər üçün LƏĞV edilib. İstisna yalnız artıq təsdiqlənmiş formatın (bölünmüş ekran 2D siluet) yeni mövzusudur.
+- Pozuntu (11-16): M22 chat POV önizləməsiz render olundu və plana yazıldı → istifadəçi rədd etdi («ancaq mətn oxuyacaq insanlar», animasiya istəyir). Chat/mətn ekranı tipli videolar RƏDD.
+
 ## 🚀 Yeni sessiyanın başlanğıcı
 1. Bu faylı oxu (avtomatik yüklənir). «Yol xəritəsi» bölməsi növbəti işi göstərir (FB hazırdır; növbəti: yol xəritəsi §2).
 2. **Tətbiqin məlumatı lazımdırsa** (yeni funksiya postu, video mühərriki, strategiyanın tam mətni), `OrkhanMirab/Constara` reposunu
@@ -85,7 +92,7 @@ Constara tətbiqinin sosial şəbəkə avtomatlaşdırması. Hazırda **@constar
 
 ## 🤖 Avtomatik gündəlik sistem (2026-11-10, istifadəçi qərarı)
 İstifadəçi: «10:00–23:00 arası hər 1,5 saatdan bir Reels, hər 30 dəqiqədən bir karusel, gündə 2 story» (risk izah olundu: spam/reach düşməsi; istifadəçi yenə istədi).
-- **Tezlik:** `schedule.json` (TR saatı). **YÜNGÜL TEMP (11-11, Meta reklam məhdudiyyətindən sonra istifadəçi: «tempi yüngül saxlayaq, radara düşməyək»): Reels gündə 2** — **11-16-dan istifadəçi: hər gün 2 YENİ saat sınanır (plan `reels_times`) və hər gün 1 sübut olunmuş + 1 YENİ TİP video** (oyrenilenler.md qayda 9–10); ehtiyat saatlar 15:00, 19:00 (11-16-dan, əvvəl 14:30, 20:30; istifadəçi «ən yaxşı vaxtlar») (biri «3 signs» sübut olunmuş niş, biri Xal testi; əvvəl 4 idi), diktorlu v16 şablonu, `video-src/_alet/reels.py` → `reels/<tarix>` budağı → plan `reels` (`video_branch`, ID `<tarix>-vreel-NN`); **karusel YOX** (11-11 axşam ləğv: reach Reels-in ~3%-i + yüngül temp), story YOX (əvvəl 12:40, 20:40). Tempi yalnız istifadəçi istəyəndə qaldır. Azaltmaq üçün yalnız bu faylı dəyiş.
+- **Tezlik:** `schedule.json` (TR saatı). **YÜNGÜL TEMP (11-11, Meta reklam məhdudiyyətindən sonra istifadəçi: «tempi yüngül saxlayaq, radara düşməyək»): Reels gündə 2** — **11-16-dan istifadəçi: hər gün 2 YENİ saat sınanır (plan `reels_times`) və hər gün 1 sübut olunmuş + 1 YENİ TİP video** (oyrenilenler.md qayda 9–10; **yeni tip yalnız istifadəçi canlı HTML önizləməni təsdiqləyəndən sonra** — «🛑 MUTLƏQ QAYDA #1»); ehtiyat saatlar 15:00, 19:00 (11-16-dan, əvvəl 14:30, 20:30; istifadəçi «ən yaxşı vaxtlar») (biri «3 signs» sübut olunmuş niş, biri Xal testi; əvvəl 4 idi), diktorlu v16 şablonu, `video-src/_alet/reels.py` → `reels/<tarix>` budağı → plan `reels` (`video_branch`, ID `<tarix>-vreel-NN`); **karusel YOX** (11-11 axşam ləğv: reach Reels-in ~3%-i + yüngül temp), story YOX (əvvəl 12:40, 20:40). Tempi yalnız istifadəçi istəyəndə qaldır. Azaltmaq üçün yalnız bu faylı dəyiş.
 - **Məzmun = data:** `plan/YYYY-MM-DD.json` (`reels` / `carousels` / `stories` siyahıları; format `plan.py` və `gen/*.py` başında). i-ci element o növün i-ci slotuna düşür. `"from": "HH:MM"` ondan əvvəlki slotları boş saxlayır.
 - **Generatorlar** (`gen/`): `carousel.py` (kind list/myth/steps, 2–10 slayd), `story.py`, `reel.py` (kinetik qrafik — **istifadəçi RƏDD etdi 11-10, işlətmə**). Media runner-də hazırlanır (git-ə düşmür); şəkillər `media` budağına tək commit kimi force-push olunur (raw URL), main-ə yalnız `posted/<id>/post.json + result.json`.
 - **Paylaşma:** `paylas.yml` bir run ~5,5 saat dövrədə işləyir, hər 2 dəq-dən bir yoxlayır (GitHub cron saatlarla gəlmir — 11-10 səhər 04:48-dən sonra run yox idi); cron (:07, :37) yalnız dövrəni yenidən başladır; hər run ən çox 3 plan elementi; slotdan 120 dəq-dən çox gecikən element atlanır (`failed/<id>` «vaxt keçdi»). `MAX_PER_24H=45`. Köhnə `queue/` yolu da işləyir.

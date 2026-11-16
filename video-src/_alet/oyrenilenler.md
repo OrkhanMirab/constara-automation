@@ -29,6 +29,7 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 
 9. **HƏR GÜN: 1 sübut olunmuş + 1 YENİ TİP video** (istifadəçi 11-16: «bütün videoları eyni tipdə paylaşma, hər zaman 1 yeni tip yoxla»).
    - Slot A = qalib format (indi: bölünmüş ekran X vs Y, qayda 7), hər dəfə yeni mövzu/dünya.
+   - 🛑 Yeni tip **həmişə əvvəl canlı HTML önizləmə → istifadəçi təsdiqi**, sonra MP4 (CLAUDE.md «MUTLƏQ QAYDA #1»). Yeni tip də **animasiyalı, axıcı səhnə** olmalıdır (personaj/hərəkət) — yalnız mətn/chat ekranı RƏDD.
    - Slot B = **yeni tip** (əvvəl paylaşılmamış quruluş: chat/mesaj POV, telefon POV, Gün 1 vs Gün 365 tək kadr, sual-cavab, «sən hansısan?» seçim, siyahı-sayğac, hekayə 1-ci şəxs, xəritə/yol POV …) — həm də yeni mövzu.
    - Hər yeni tip «Tip sınağı» cədvəlinə yazılır; 2 videoda bazadan ≥2× yaxşıdırsa → qaliblərə qoşulur (slot A-da növbələşir); 2 dəfə bazada qalırsa → atılır.
 10. **HƏR GÜN 2 YENİ SAAT** (istifadəçi 11-16: «hər gün 2 yeni vaxtı araşdır»). Plan faylına `"reels_times": ["HH:MM","HH:MM"]` yaz, «Saat sınağı» cədvəlindən ən az sınanmış 2 saatı götür
@@ -41,7 +42,7 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 | 11:00–12:30 | 3 | baza / aşağı |
 | 13:00 | 0 | 11-16 sınaq (M20) |
 | 14:00–15:30 | 8 | baza |
-| 16:00–16:30 | 0 | 11-16 sınaq (M22) |
+| 16:00–16:30 | 0 | 11-16 sınaq (M21) |
 | 17:00–18:30 | 6 | baza (+ M14 partlayışı) |
 | 19:00 | 2 | M19 partlayışı (format?) |
 | 20:00–21:30 | 10 | baza |
@@ -53,9 +54,9 @@ Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:3
 |---|---|---|
 | bölünmüş ekran X vs Y | M14, M19 | ✅ qalib (2/2) |
 | 11 s loop | M15, M07 | ❌ atıldı |
-| chat POV «gələcək sən yazır» | M22 (11-16, 16:30) | sınaqda |
+| chat POV «gələcək sən yazır» | M22 (11-16) | ❌ istifadəçi RƏDD etdi (yalnız mətn, animasiya yox) — paylaşılmadı |
 
-**Hazır növbə:** M21 «Zəngli saat» (bölünmüş ekran) `reels/2026-11-16/m21.mp4` — 11-17 slot A-da işlət (yenidən render lazım deyil).
+M21 «Zəngli saat» 11-16 16:30-da M22-nin yerinə getdi.
 
 ## Bazada qalanlar (təkrar etmə, ən azı 2 həftə)
 sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyəti); weed (11-12: bazada + FB yükləməsi uğursuz — **narkotik mövzuları YOX**).
