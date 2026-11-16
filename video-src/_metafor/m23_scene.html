@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:MO;src:url(file:///usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf)}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/*TL*/
+// M23 «Bir çəkiliş» (11-16, YENİ TİP): fasiləsiz kamera. Divanda telefon → telefonu qoyur, qalxır, kamera kəsilmədən onunla gedir;
+// fəsillər axır (yağış → qar → çiçək → yay şəfəqi), iz = qrafik, Day 30 yıxılır (−5); zirvədə geri çəkilmə (+355); REWIND → yenə divan (loop).
+const T = window.TL, W = 1080, H = 1920, P1 = 330, P2 = 1050, PH = 660, PX = 30, PW = 1020;
+const cv = document.getElementById('c'), X = cv.getContext('2d');
+const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const FIG = mk(), FX = FIG.getContext('2d'), RIM = mk(), RX = RIM.getContext('2d');
+const GOLD = '#F7C04A', RED = '#FF5A4A', WHITE = '#F4F1EA', GREY = '#A7ADB5';
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const eio = u => .5 - .5 * Math.cos(Math.PI * clamp(u));
+const eout = u => 1 - Math.pow(1 - u, 3);
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const bump = (t, c, w) => Math.exp(-Math.pow((t - c) / w, 2));
+const R = k => { const x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+let G = x => 0, slopeA = x => 0;
+let C = { cx: 0, cy: 0, s: 100 };
+const sx = x => C.ox + C.w / 2 + (x - C.cx) * C.s, sy = y => C.oy + C.h / 2 - (y - C.cy) * C.s, S = p => [sx(p[0]), sy(p[1])];
+function dayAt(t) { const D = T.days; let d = D[0][1]; for (let i = 0; i < D.length - 1; i++) { const [a, d0] = D[i], [b, d1] = D[i + 1]; if (t >= a) { let u = clamp((t - a) / (b - a)); u = u * u * (3 - 2 * u); d = d0 + (d1 - d0) * u; } } return d; }
+const DIPS = [30.5, 121];
+const sig = x => 1 / (1 + Math.exp(-x * 2.2));
+const hgt = d => .95 * d + 10 * Math.sin(d / 7) - 34 * sig(d - DIPS[0]) - 28 * sig(d - DIPS[1]);
+const score = d => Math.round(d - 5 * DIPS.filter(c => d > c).length);
+// ---------------- IK + poza ----------------
+function ik(A, Tg, l1, l2, side) {
+  let dx = Tg[0] - A[0], dy = Tg[1] - A[1], d = Math.hypot(dx, dy); const dm = Math.min(d, l1 + l2 - 1e-4), a = Math.atan2(dy, dx);
+  const c = Math.acos(clamp((l1 * l1 + dm * dm - l2 * l2) / (2 * l1 * dm), -1, 1)), an = a + side * c;
+  const J = [A[0] + Math.cos(an) * l1, A[1] + Math.sin(an) * l1], b = Math.atan2(Tg[1] - J[1], Tg[0] - J[0]);
+  return [J, [J[0] + Math.cos(b) * l2, J[1] + Math.sin(b) * l2]];
+}
+const LT = .485, LS = .47, ANK = .085, LU = .3, LF = .27, TOR = .52;
+function bl(a, b, u) { if (typeof a === "number") return lerp(a, b, u); if (Array.isArray(a)) return a.map((v, i) => lerp(v, b[i], u)); const o = {}; for (const k in a) o[k] = typeof a[k] === 'number' || Array.isArray(a[k]) ? bl(a[k], b[k], u) : a[k]; return o; }
+function walkPose(x, amp, lantern) {
+  const g = G(x), ph = x / T.stride * Math.PI * 2, step = T.stride / 2, feet = [];
+  for (let i = 0; i < 2; i++) {
+    const u = ((ph / (2 * Math.PI) + i * .5) % 1 + 1) % 1; let rel, lift = 0, ang;
+    if (u < .62) { rel = step / 2 - u / .62 * step; ang = slopeA(x + rel) + .45 * seg(u, .48, .62); }
+    else { const v = (u - .62) / .38; rel = -step / 2 + eio(v) * step; lift = .14 * Math.sin(Math.PI * v); ang = slopeA(x + rel) + .45 * (1 - seg(v, 0, .4)) - .2 * Math.sin(Math.PI * v); }
+    rel *= amp; lift *= amp; const fxw = x + rel;
+    feet.push([fxw, G(fxw) + ANK + lift + (ang - slopeA(fxw)) * .06, amp > .05 ? ang : slopeA(fxw)]);
+  }
+  if (amp < 1) { feet[0] = bl(feet[0], [x + .1, g + ANK, slopeA(x + .1)], 1 - amp); feet[1] = bl(feet[1], [x - .12, g + ANK, slopeA(x - .12)], 1 - amp); }
+  let hy = g + 1.0 + .022 * Math.cos(ph * 2) * amp;
+  for (const f of feet) hy = Math.min(hy, f[1] + Math.sqrt(Math.max(0, .935 * .935 - (f[0] - x) ** 2)));
+  const sl = slopeA(x), a = .38 * Math.sin(ph) * amp;
+  return { hip: [x - .02, hy], lean: .06 + clamp(sl * .55, -.08, .3) * amp, head: -.03, fN: feet[0], fF: feet[1],
+    hN: lantern ? [.2 + .02 * Math.sin(ph), -.47] : [.55 * Math.sin(-a), -.55 * Math.cos(a)], hF: [.55 * Math.sin(a), -.55 * Math.cos(a)] };
+}
+function solve(p) {
+  const sh = [p.hip[0] + Math.sin(p.lean) * TOR, p.hip[1] + Math.cos(p.lean) * TOR];
+  const leg = f => { const [kn, an] = ik(p.hip, [f[0], f[1]], LT, LS, 1); return { kn, an, fa: f[2] }; };
+  const arm = h => {  // anatomik limit: bazu gövdəyə nisbətən ~20°-dən çox arxaya getmir, dirsək həmişə irəli bükülür
+    const tg = [sh[0] + h[0], sh[1] + h[1]]; let [el, wr] = ik(sh, tg, LU, LF, -1);
+    const dn = Math.atan2(-Math.cos(p.lean), -Math.sin(p.lean)), ua = Math.atan2(el[1] - sh[1], el[0] - sh[0]);
+    let rel = ua - dn; while (rel > Math.PI) rel -= 2 * Math.PI; while (rel < -Math.PI) rel += 2 * Math.PI;
+    if (rel < -.35) { const a = dn - .35; el = [sh[0] + Math.cos(a) * LU, sh[1] + Math.sin(a) * LU]; const b = Math.atan2(tg[1] - el[1], tg[0] - el[0]); wr = [el[0] + Math.cos(b) * LF, el[1] + Math.sin(b) * LF]; }
+    return { el, wr };
+  };
+  const nb = [sh[0] + Math.sin(p.lean) * .05, sh[1] + Math.cos(p.lean) * .05], ha = p.lean * .55 + p.head;
+  return { hip: p.hip, sh, lean: p.lean, nb, head: [nb[0] + Math.sin(ha) * .15 + .015, nb[1] + Math.cos(ha) * .15], ha, N: leg(p.fN), Fa: leg(p.fF), aN: arm(p.hN), aF: arm(p.hF) };
+}
+// ---------------- insan silueti (yan görünüş, sağa baxır) ----------------
+function cap(c, A, B, ra, rb) {  // konik kapsul (piksel)
+  const dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy) || 1e-6, nx = -dy / L, ny = dx / L;
+  c.beginPath(); c.arc(A[0], A[1], ra, 0, 7); c.fill(); c.beginPath(); c.arc(B[0], B[1], rb, 0, 7); c.fill();
+  c.beginPath(); c.moveTo(A[0] + nx * ra, A[1] + ny * ra); c.lineTo(B[0] + nx * rb, B[1] + ny * rb); c.lineTo(B[0] - nx * rb, B[1] - ny * rb); c.lineTo(A[0] - nx * ra, A[1] - ny * ra); c.closePath(); c.fill();
+}
+function smooth(c, pts) { c.beginPath(); const n = pts.length; c.moveTo((pts[n - 1][0] + pts[0][0]) / 2, (pts[n - 1][1] + pts[0][1]) / 2);
+  for (let i = 0; i < n; i++) { const a = pts[i], b = pts[(i + 1) % n]; c.quadraticCurveTo(a[0], a[1], (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); } c.closePath(); c.fill(); }
+function person(c, J, o) {
+  if (J.dir === -1 || o.k) { const gx = sx(J.hip[0]), gy = sy(J.gy ?? 0); c.save(); c.translate(gx, gy); c.scale(J.dir === -1 ? -(o.k || 1) : (o.k || 1), o.k || 1); c.translate(-gx, -gy); personRaw(c, J, o); c.restore(); }
+  else personRaw(c, J, o);
+}
+function personRaw(c, J, o) {
+  const s = C.s, m = v => v * s, w2s = p => S(p);
+  const leg = (L, far) => {
+    const hp = w2s(J.hip), kn = w2s(L.kn), an = w2s(L.an), mid = [lerp(kn[0], an[0], .35) - (an[1] - kn[1]) * .03, lerp(kn[1], an[1], .35)];
+    cap(c, hp, kn, m(.088), m(.062)); cap(c, kn, mid, m(.062), m(.066)); cap(c, mid, an, m(.066), m(.042));
+    // çəkmə
+    const fa = L.fa, ca = Math.cos(fa), sa = Math.sin(fa), q = (u, v) => S([L.an[0] + ca * u - sa * v, L.an[1] + sa * u + ca * v]);
+    smooth(c, [q(-.06, .05), q(-.085, -.02), q(-.075, -.085), q(.08, -.088), q(.19, -.082), q(.205, -.045), q(.15, -.02), q(.06, .025), q(.03, .06)]);
+  };
+  const arm = (A, far) => { const sh = w2s(J.sh), el = w2s(A.el), wr = w2s(A.wr); cap(c, sh, el, m(.064), m(.05)); cap(c, el, wr, m(.05), m(.038));
+    const d = [wr[0] - el[0], wr[1] - el[1]], L = Math.hypot(...d) || 1; c.beginPath(); c.ellipse(wr[0] + d[0] / L * m(.055), wr[1] + d[1] / L * m(.055), m(.065), m(.045), Math.atan2(d[1], d[0]), 0, 7); c.fill(); };
+  const torso = () => {
+    const u = [J.sh[0] - J.hip[0], J.sh[1] - J.hip[1]], L = Math.hypot(...u), ux = u[0] / L, uy = u[1] / L, vx = uy, vy = -ux;
+    const q = (a, b) => S([J.hip[0] + ux * a * L + vx * b, J.hip[1] + uy * a * L + vy * b]), k = o.puffy || 1;
+    smooth(c, [q(-.05, -.13 * k), q(.16, -.14 * k), q(.42, -.1 * k), q(.74, -.12 * k), q(.98, -.075 * k), q(1.04, .02), q(.9, .11 * k), q(.66, .135 * k), q(.42, .11 * k), q(.16, .115 * k), q(-.05, .1 * k)]);
+    if (o.pack) { const pc = q(.6, -.2), a = Math.atan2(-(uy), ux) + Math.PI / 2; c.save(); c.translate(...pc); c.rotate(-Math.atan2(uy, ux) + Math.PI / 2); c.beginPath(); c.roundRect(-m(.11), -m(.2), m(.2), m(.4), m(.06)); c.fill(); c.restore(); }
+    return q;
+  };
+  const head = () => {
+    const hc = w2s(J.head), nb = w2s(J.nb); cap(c, nb, [lerp(nb[0], hc[0], .7), lerp(nb[1], hc[1], .7)], m(.062), m(.054));
+    c.save(); c.translate(...hc); c.rotate(J.ha * 1);
+    const pt = (u, v) => [m(u), -m(v)];
+    c.beginPath(); c.ellipse(0, -m(.005), m(.098), m(.118), 0, 0, 7); c.fill();
+    smooth(c, [pt(.0, .1), pt(.06, .085), pt(.097, .04), pt(.1, .012), pt(.124, -.018), pt(.1, -.036), pt(.106, -.062), pt(.094, -.09), pt(.084, -.112), pt(.035, -.132), pt(-.04, -.1), pt(-.06, .0)]);
+    if (o.beanie) { c.beginPath(); c.ellipse(-m(.005), -m(.05), m(.108), m(.095), -.15, Math.PI, 2 * Math.PI); c.fill(); c.beginPath(); c.roundRect(-m(.11), -m(.06), m(.21), m(.035), m(.01)); c.fill(); }
+    if (o.hair) { c.beginPath(); c.ellipse(-m(.01), -m(.045), m(.106), m(.09), -.2, Math.PI * .95, 2.05 * Math.PI); c.fill(); c.beginPath(); c.ellipse(-m(.07), -m(.02), m(.045), m(.06), .3, 0, 7); c.fill(); }
+    if (o.long) { c.beginPath(); c.ellipse(-m(.03), -m(.03), m(.11), m(.1), -.2, Math.PI * .9, 2.1 * Math.PI); c.fill(); c.beginPath(); c.roundRect(-m(.13), -m(.05), m(.1), m(.3), m(.04)); c.fill(); }
+    if (o.capH) { c.beginPath(); c.ellipse(-m(.0), -m(.05), m(.105), m(.085), 0, Math.PI, 2 * Math.PI); c.fill(); c.beginPath(); c.roundRect(m(.02), -m(.065), m(.15), m(.025), m(.01)); c.fill(); }
+    if (o.bun) { c.beginPath(); c.arc(-m(.08), -m(.1), m(.05), 0, 7); c.fill(); c.beginPath(); c.ellipse(-m(.01), -m(.04), m(.104), m(.09), -.2, Math.PI * .95, 2.05 * Math.PI); c.fill(); }
+    c.restore();
+  };
+  leg(J.Fa, true); arm(J.aF, true); torso(); head(); leg(J.N, false); arm(J.aN, false);
+}
+function litFigure(J, o, lights, base) {
+  // yalnız fiqurun çərçivəsində işlə (telefonda sürət üçün)
+  let pts = [J.hip, J.sh, J.head, J.N.kn, J.N.an, J.Fa.kn, J.Fa.an, J.aN.el, J.aN.wr, J.aF.el, J.aF.wr].map(S); const hx = sx(J.hip[0]); pts = pts.concat(pts.map(p => [2 * hx - p[0], p[1]])); const mg = .55 * C.s * (o.k || 1) + 12;
+  let bx = Math.max(0, Math.floor(Math.min(...pts.map(p => p[0])) - mg)), by = Math.max(0, Math.floor(Math.min(...pts.map(p => p[1])) - mg));
+  let bw = Math.min(W, Math.ceil(Math.max(...pts.map(p => p[0])) + mg)) - bx, bh = Math.min(H, Math.ceil(Math.max(...pts.map(p => p[1])) + mg)) - by;
+  if (bw <= 0 || bh <= 0) return;
+  FX.setTransform(1, 0, 0, 1, 0, 0); FX.globalCompositeOperation = 'source-over'; FX.globalAlpha = 1; FX.clearRect(bx, by, bw, bh);
+  FX.fillStyle = base; person(FX, J, o);
+  const cx = sx(J.hip[0]), cy = sy(J.hip[1] + .35);
+  for (const L of lights) {
+    if (L.a <= .01) continue;
+    const dx = L.p[0] - cx, dy = L.p[1] - cy, d = Math.hypot(dx, dy) || 1, k = clamp(.016 * C.s, .7, 5) * (L.k || 1);
+    FX.globalCompositeOperation = 'source-atop'; let g = FX.createRadialGradient(L.p[0], L.p[1], 0, L.p[0], L.p[1], L.r);
+    g.addColorStop(0, L.fill.replace('A', (.32 * L.a).toFixed(3))); g.addColorStop(1, L.fill.replace('A', '0')); FX.fillStyle = g; FX.fillRect(bx, by, bw, bh);
+    RX.setTransform(1, 0, 0, 1, 0, 0); RX.globalCompositeOperation = 'source-over'; RX.clearRect(bx, by, bw, bh); RX.fillStyle = L.rim; person(RX, J, o);
+    RX.globalCompositeOperation = 'destination-out'; RX.fillStyle = '#000'; RX.translate(-dx / d * k, -dy / d * k); person(RX, J, o); RX.setTransform(1, 0, 0, 1, 0, 0);
+    if (L.r2) { RX.globalCompositeOperation = 'destination-in'; let g2 = RX.createRadialGradient(L.p[0], L.p[1], 0, L.p[0], L.p[1], L.r2); g2.addColorStop(0, 'rgba(0,0,0,1)'); g2.addColorStop(1, 'rgba(0,0,0,.08)'); RX.fillStyle = g2; RX.fillRect(bx, by, bw, bh); }
+    FX.globalCompositeOperation = 'source-atop'; FX.globalAlpha = L.a * (L.ra || 1); FX.drawImage(RIM, bx, by, bw, bh, bx, by, bw, bh); FX.globalAlpha = 1;
+  }
+  if (o.glow) { X.save(); X.shadowColor = o.glow; X.shadowBlur = o.gb || 26; X.drawImage(FIG, bx, by, bw, bh, bx, by, bw, bh); X.restore(); }
+  X.drawImage(FIG, bx, by, bw, bh, bx, by, bw, bh);
+}
+
+
+// ---------------- M23 «Bir çəkiliş»: fasiləsiz kamera, fəsillər, REWIND ----------------
+const X0 = 2.8, xOf = d => X0 + .165 * (d - 1), dOfX = x => 1 + (x - X0) / .165;
+const roadH = d => .03 * (.95 * d + 10 * Math.sin(d / 7) - 34 / (1 + Math.exp(-(d - 30.5) / 1.5)) - 28 / (1 + Math.exp(-(d - 121) / 4)));
+const ROAD = x => x < X0 ? 0 : roadH(dOfX(x)) - roadH(1);
+G = x => ROAD(x); slopeA = x => Math.atan2(ROAD(x + .05) - ROAD(x - .05), .1);
+const SX = -.6;  // divan
+const mixc = (a, b, u) => a.map((v, i) => lerp(v, b[i], clamp(u)));
+const rgb = c => `rgb(${c.map(Math.round).join(',')})`;
+// fəsillər: [gün, səma üst, səma alt, torpaq]
+const SEAS = [[1, [6, 8, 14], [16, 20, 32], [14, 13, 12]], [55, [12, 16, 26], [40, 48, 62], [18, 18, 20]], [95, [14, 18, 30], [70, 78, 96], [150, 156, 168]],
+  [170, [20, 30, 54], [60, 80, 90], [16, 24, 16]], [280, [26, 22, 52], [150, 90, 90], [24, 18, 16]], [365, [40, 40, 80], [255, 160, 90], [30, 20, 18]]];
+function seasonCol(d) { for (let i = 0; i < SEAS.length - 1; i++) { const [a, ...A] = SEAS[i], [b, ...B] = SEAS[i + 1]; if (d <= b) { const u = (d - a) / (b - a); return A.map((c, k) => mixc(c, B[k], u * u * (3 - 2 * u))); } } return SEAS[SEAS.length - 1].slice(1); }
+const rainA = d => bump(d, 32, 20), snowA = d => bump(d, 100, 30), bloomA = d => bump(d, 200, 45);
+const STARS = Array.from({ length: 160 }, (_, i) => [R(i * 3 + 1), R(i * 3 + 2) * .5, .5 + Math.pow(R(i * 3 + 3), 5) * 2]);
+function world(t, d, rev) {
+  const [top, bot, gnd] = seasonCol(d), dawn = clamp((d - 250) / 115);
+  let g = X.createLinearGradient(0, 0, 0, H); g.addColorStop(0, rgb(top)); g.addColorStop(.7, rgb(bot)); g.addColorStop(1, rgb(mixc(bot, [0, 0, 0], .5))); X.fillStyle = g; X.fillRect(0, 0, W, H);
+  for (const [a, b, r] of STARS) { X.fillStyle = `rgba(225,232,255,${(.2 + .4 * (r - .5) / 2) * (1 - dawn) * (1 - snowA(d) * .7)})`; X.fillRect(((a * W - C.cx * 4) % W + W) % W, b * H, r, r); }
+  // günəş / ay
+  const sunY = lerp(H * .62, H * .3, clamp((t - 15.8) / 3)) , sx0 = W * .76;
+  if (dawn > 0) { let m = X.createRadialGradient(sx0, sunY, 0, sx0, sunY, 520); m.addColorStop(0, `rgba(255,190,110,${.55 * dawn})`); m.addColorStop(1, 'rgba(0,0,0,0)'); X.fillStyle = m; X.fillRect(0, 0, W, H);
+    X.fillStyle = `rgba(255,236,190,${dawn})`; X.beginPath(); X.arc(sx0, sunY, 44, 0, 7); X.fill(); }
+  const moon = [W * .2, H * .2]; X.fillStyle = `rgba(232,236,245,${1 - dawn})`; X.beginPath(); X.arc(...moon, 26, 0, 7); X.fill();
+  // uzaq dağlar (paralaks)
+  for (const [k, sh, amp] of [[.15, .55, 160], [.32, .38, 110]]) {
+    X.fillStyle = rgb(mixc(mixc(bot, [0, 0, 0], sh), [255, 255, 255], snowA(d) * .15)); X.beginPath(); X.moveTo(0, H);
+    for (let x = 0; x <= W; x += 12) X.lineTo(x, sy(ROAD(C.cx) * k) - 260 * k * 3 - amp * (1 + Math.sin((x + C.cx * C.s * k) / 210)) - 40 * Math.sin((x + C.cx * C.s * k) / 63));
+    X.lineTo(W, H); X.fill();
+  }
+  return { moon, sun: [sx0, sunY], dawn, gnd };
+}
+function ground(gnd, d) {
+  const xa = C.cx - W / 2 / C.s - 1, xb = C.cx + W / 2 / C.s + 1, st = Math.max(.02, 2 / C.s);
+  X.fillStyle = rgb(mixc(gnd, [0, 0, 0], .35)); X.beginPath(); X.moveTo(sx(xa), H);
+  for (let x = xa; x <= xb; x += st) X.lineTo(sx(x), sy(ROAD(x))); X.lineTo(sx(xb), H); X.fill();
+  X.strokeStyle = snowA(d) > .3 ? `rgba(240,245,255,${.8 * snowA(d)})` : 'rgba(255,255,255,.08)'; X.lineWidth = Math.max(2, .05 * C.s * snowA(d) + 2); X.beginPath();
+  for (let x = Math.max(xa, X0); x <= xb; x += st) { const p = [sx(x), sy(ROAD(x))]; x === Math.max(xa, X0) ? X.moveTo(...p) : X.lineTo(...p); } X.stroke();
+  // ağaclar
+  for (let i = 0; i < 70; i++) { const tx = X0 + 1.5 + i * .9 + R(i) * .5; if (tx < xa || tx > xb) continue; const by = sy(ROAD(tx)), hh = (1.2 + R(i + 5) * 1.4) * C.s * .55;
+    X.strokeStyle = rgb(mixc(gnd, [0, 0, 0], .7)); X.lineWidth = Math.max(2, .05 * C.s); X.beginPath(); X.moveTo(sx(tx), by); X.lineTo(sx(tx), by - hh); X.stroke();
+    for (let k = 0; k < 4; k++) { X.beginPath(); X.moveTo(sx(tx), by - hh * (.45 + k * .13)); X.lineTo(sx(tx) + (k % 2 ? 1 : -1) * hh * .28, by - hh * (.6 + k * .12)); X.stroke(); }
+    const leaf = bloomA(d) + .6 * clamp((d - 240) / 60); if (leaf > .05) { X.fillStyle = bloomA(d) > .4 ? `rgba(255,170,200,${.7 * leaf})` : `rgba(60,110,60,${.8 * leaf})`; X.beginPath(); X.ellipse(sx(tx), by - hh * .9, hh * .3, hh * .25, 0, 0, 7); X.fill(); }
+    if (snowA(d) > .3) { X.fillStyle = `rgba(240,245,255,${.7 * snowA(d)})`; X.beginPath(); X.ellipse(sx(tx), by - hh * .95, hh * .12, hh * .05, 0, 0, 7); X.fill(); } }
+}
+function weather(t, d) {
+  const ra = rainA(d), sa = snowA(d);
+  if (ra > .05) { X.save(); X.strokeStyle = `rgba(170,190,230,${.35 * ra})`; X.lineWidth = 2; for (let i = 0; i < 160; i++) { const x = (R(i) * W + t * 120) % W, y = ((R(i + 7) * H + t * 1900) % H); X.beginPath(); X.moveTo(x, y); X.lineTo(x - 8, y + 34); X.stroke(); } X.restore(); }
+  if (sa > .05) { X.save(); X.fillStyle = `rgba(245,248,255,${.85 * sa})`; for (let i = 0; i < 150; i++) { const x = (R(i) * W + Math.sin(t * 1.3 + i) * 30 - t * 40 + W * 4) % W, y = (R(i + 9) * H + t * (90 + 60 * R(i + 3))) % H; X.beginPath(); X.arc(x, y, 2 + 3 * R(i + 1), 0, 7); X.fill(); } X.restore(); }
+  const pa = bloomA(d); if (pa > .1) { X.save(); X.fillStyle = `rgba(255,180,205,${.7 * pa})`; for (let i = 0; i < 40; i++) { const x = (R(i) * W - t * 160 + W * 9) % W, y = (R(i + 9) * H + t * 70) % H; X.beginPath(); X.ellipse(x, y, 6, 3, t + i, 0, 7); X.fill(); } X.restore(); }
+}
+function room(t, a) {
+  if (a <= 0 || C.cx - W / 2 / C.s > 3) return;
+  X.save(); X.globalAlpha = a;
+  X.fillStyle = '#0b0c11'; X.fillRect(sx(-4), sy(3.2), (2.3 + 4) * C.s, 3.2 * C.s);   // arxa divar
+  X.fillStyle = '#05060a'; X.fillRect(sx(1.7), sy(2.3), .7 * C.s, 2.3 * C.s);            // qapı
+  const wx = sx(-2.6), wy = sy(2.6), ww = 1.2 * C.s, wh = 1.1 * C.s; X.fillStyle = '#101828'; X.fillRect(wx, wy, ww, wh);
+  for (let i = 0; i < 7; i++) { const bh = (.3 + R(i + 3) * .6) * wh; X.fillStyle = '#070a12'; X.fillRect(wx + i * ww / 7, wy + wh - bh, ww / 7 - 2, bh); }
+  X.strokeStyle = '#1b1e26'; X.lineWidth = 8; X.strokeRect(wx, wy, ww, wh);
+  X.fillStyle = '#16181f'; X.beginPath(); X.roundRect(sx(SX - .75), sy(.5), 1.55 * C.s, .32 * C.s, 14); X.fill();
+  X.beginPath(); X.roundRect(sx(SX - .85), sy(1.15), .28 * C.s, 1.0 * C.s, 16); X.fill();
+  X.restore();
+}
+function sitPose(look) { return { hip: [SX - .25, .66], lean: lerp(-.22, -.05, look), head: lerp(.6, -.15, look), fN: [SX + .34, ANK, 0], fF: [SX + .24, ANK, 0], hN: [lerp(.36, .3, look), lerp(.02, -.2, look)], hF: [lerp(.33, .2, look), lerp(0, -.3, look)] }; }
+function walkerPose(t, d) {
+  if (t < T.stand) return { p: sitPose(seg(t, T.down - .4, T.down)), x: SX - .25, phone: 1 - seg(t, T.down - .2, T.down + .3) };
+  const x = t < T.walk ? lerp(SX - .25, SX + .3, seg(t, T.stand, T.walk)) : Math.max(SX + .3, lerp(SX + .3, xOf(d), seg(t, T.walk, T.walk + 1.2)));
+  const dd = .02, sp = Math.abs(xOf(dayAt(t + dd)) - xOf(dayAt(t))) / dd;
+  if (t < T.walk) { const u = eio(seg(t, T.stand, T.walk)); return { p: bl(sitPose(1), walkPose(x, 0, false), u), x, phone: 0 }; }
+  const amp = clamp(.4 + sp / 2), p = walkPose(x, amp, false);
+  if (sp > 2.2) { const ph = x / T.stride * Math.PI * 2; p.lean = .22 + slopeA(x) * .4; p.hN = [.04 + .2 * Math.sin(-ph), -.4]; p.hF = [.04 + .2 * Math.sin(ph), -.4]; }
+  const fall = bump(t, T.fall, .45);
+  if (fall > .01) { const g = ROAD(x), kneel = { hip: [x - .1, g + .55], lean: .65, head: .3, fN: [x + .35, g + ANK, slopeA(x)], fF: [x - .55, g + .06, slopeA(x) + 1.2], hN: [.35, -.45], hF: [.3, -.5] }; return { p: bl(p, kneel, fall), x, phone: 0, fall }; }
+  return { p, x, phone: 0 };
+}
+function scene(t) {   // t = hekayə vaxtı (rewind-də geri gedir)
+  const d = dayAt(t), st = walkerPose(t, d), r = ease(seg(t, T.reveal, T.reveal + 2.2));
+  const xEnd = xOf(365), xMid = (X0 + xEnd) / 2 - 1.5, s1 = W * .82 / (xEnd - X0 + 3);
+  const sClose = t < T.walk + .5 ? 300 : lerp(300, 210, seg(t, T.walk, T.walk + 2));
+  const s = Math.exp(lerp(Math.log(sClose), Math.log(s1), r));
+  C = { ox: 0, oy: 0, w: W, h: H, cx: lerp(st.x + (t < T.walk ? .2 : .6), xMid, r), cy: lerp(ROAD(st.x) + 1.4 - (t < T.walk ? .3 : 0), (roadH(365) - roadH(1)) * .5 + 1.5, r), s };
+  const wd = world(t, d);
+  ground(wd.gnd, d); room(t, 1 - seg(t, T.walk + 1, T.walk + 2));
+  // iz = qrafik
+  if (t > T.walk) { X.save(); X.globalCompositeOperation = 'lighter'; X.lineCap = 'round'; X.lineJoin = 'round'; X.lineWidth = Math.max(3, .035 * s); X.shadowBlur = 16; let prev = null;
+    for (let x = X0; x <= st.x; x += Math.max(.02, 1.5 / s)) { const q = [sx(x), sy(ROAD(x) + .01)], dip = Math.abs(dOfX(x) - 30.5) < 4 || Math.abs(dOfX(x) - 121) < 5; if (prev) { X.strokeStyle = dip ? 'rgba(255,90,74,.95)' : 'rgba(247,192,74,.85)'; X.shadowColor = X.strokeStyle; X.beginPath(); X.moveTo(...prev); X.lineTo(...q); X.stroke(); } prev = q; } X.restore(); }
+  const J = solve(st.p), lights = [{ p: wd.dawn > .2 ? wd.sun : wd.moon, a: .5 + .5 * wd.dawn, r: 10, fill: 'rgba(255,170,90,A)', rim: wd.dawn > .2 ? 'rgb(255,214,160)' : 'rgb(190,205,240)', k: 1.3 }];
+  let phonePt = null; if (st.phone > 0) { phonePt = S(J.aN.wr); lights.push({ p: [phonePt[0] + 10, phonePt[1] - 12], a: st.phone, r: .7 * s, r2: .9 * s, fill: 'rgba(110,160,255,A)', rim: 'rgb(150,190,255)', k: 1.1 }); }
+  if (r < .8) { X.save(); X.globalAlpha = 1 - r / .8; litFigure(J, { hair: true, puffy: 1, glow: st.phone > .3 ? 'rgba(110,150,255,.4)' : 'rgba(255,200,130,.6)', gb: 18 }, lights, '#14110f'); X.restore(); }
+  // telefon
+  if (t < T.walk + .5) { const pp = st.phone > 0 ? phonePt : S([SX + .55, .84]); X.save(); X.translate(pp[0] + 10, pp[1] - 12); X.rotate(st.phone > 0 ? -.5 : 0); X.fillStyle = '#0c0f16'; X.fillRect(-12, -22, 24, 44);
+    if (st.phone > 0) { X.fillStyle = `rgba(150,190,255,${st.phone})`; X.fillRect(-10, -20, 20, 40); } X.restore();
+    if (st.phone > 0) { X.save(); X.globalCompositeOperation = 'lighter'; let lg = X.createRadialGradient(pp[0], pp[1], 2, pp[0], pp[1], 200); lg.addColorStop(0, `rgba(110,160,255,${.35 * st.phone})`); lg.addColorStop(1, 'rgba(0,0,0,0)'); X.fillStyle = lg; X.fillRect(pp[0] - 210, pp[1] - 210, 420, 420); X.restore(); } }
+  weather(t, d);
+  const u5 = t - T.fall; if (u5 > 0 && u5 < 1.4 && r === 0) { X.save(); X.globalAlpha = Math.min(1, u5 * 6) * (1 - seg(u5, 1, 1.4)); X.font = '60px MO'; X.textAlign = 'center'; X.fillStyle = RED; X.shadowColor = RED; X.shadowBlur = 18; X.fillText('−5', sx(st.x + .3), sy(ROAD(st.x) + 2.2) - u5 * 50); X.restore(); }
+  if (r > 0) { X.save(); X.globalAlpha = r; X.font = '64px MO'; X.fillStyle = GOLD; X.shadowColor = GOLD; X.shadowBlur = 24; X.textAlign = 'right'; X.fillText('+' + score(365), sx(xEnd) + 10, sy(ROAD(xEnd)) - 60); X.restore(); }
+  return d;
+}
+function hud(d, t) {
+  const ok = t > T.walk - .3 && t < T.end;
+  if (!ok) return;
+  pill(W / 2 - 20, 360, `DAY ${Math.round(d)}`, WHITE, 'rgba(8,8,10,.8)', 'r');
+  const fallNow = bump(t, T.fall + .3, .5) > .3; pill(W / 2 + 20, 360, `SCORE +${Math.max(0, score(d))}`, fallNow ? RED : GOLD, 'rgba(20,16,8,.8)', 'l');
+}
+// ---------------- çərçivə, mətn ----------------
+function panelClip(y, col, fn) {
+  X.save(); X.beginPath(); X.roundRect(PX, y, PW, PH, 28); X.clip(); fn(); X.restore();
+  X.save(); X.strokeStyle = col; X.lineWidth = 2; X.beginPath(); X.roundRect(PX, y, PW, PH, 28); X.stroke(); X.restore();
+}
+function caption(t) {
+  for (const [a, b, txt, hi, hc] of T.texts) {
+    if (t < a || t > b) continue;
+    const al = Math.min(seg(t, a, a + .25), 1 - seg(t, b - .2, b)), lines = txt.split('\n');
+    X.save(); X.globalAlpha = al; X.font = (lines.length > 2 || txt.length > 40 ? '38px' : '46px') + ' MO'; X.letterSpacing = '3px'; X.textBaseline = 'middle';
+    const lh = lines.length > 2 ? 56 : 64, y0 = 215 - (lines.length - 1) * lh / 2 + (1 - eout(seg(t, a, a + .35))) * 12;
+    lines.forEach((ln, li) => { let x = W / 2 - X.measureText(ln).width / 2; const y = y0 + li * lh, i = ln.indexOf(hi);
+      const parts = i < 0 ? [[ln, WHITE]] : [[ln.slice(0, i), WHITE], [hi, hc === 'red' ? RED : GOLD], [ln.slice(i + hi.length), WHITE]];
+      for (const [p, c] of parts) { if (!p) continue; X.fillStyle = c; X.shadowColor = c === WHITE ? 'rgba(0,0,0,.6)' : c; X.shadowBlur = c === WHITE ? 8 : 18; X.fillText(p, x, y); x += X.measureText(p).width; } });
+    X.restore();
+  }
+}
+function pill(x, y, txt, col, bg, align) {
+  X.save(); X.font = '28px MO'; X.letterSpacing = '3px'; const w = X.measureText(txt).width + 40, x0 = align === 'c' ? x - w / 2 : align === 'r' ? x - w : x;
+  X.fillStyle = bg; X.strokeStyle = col; X.lineWidth = 2; X.beginPath(); X.roundRect(x0, y - 26, w, 52, 26); X.fill(); X.stroke();
+  X.fillStyle = col; X.textBaseline = 'middle'; X.fillText(txt, x0 + 20, y + 1); X.restore();
+}
+const NOISE = [0, 1, 2].map(k => { const c = mk(540, 960), x = c.getContext('2d'), d = x.createImageData(540, 960); for (let i = 0; i < d.data.length; i += 4) { const v = 128 + (R(i * .37 + k * 91.3) - .5) * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c; });
+window.draw = function (t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.globalCompositeOperation = 'source-over'; X.shadowBlur = 0; X.letterSpacing = '0px';
+  const rw = seg(t, T.rew, T.rew2), inRew = t >= T.rew && t < T.rew2;
+  const st = inRew ? lerp(T.rew - .2, .3, ease(rw)) : (t >= T.rew2 ? lerp(.3, 1.6, seg(t, T.rew2, T.dur)) : t);
+  const d = scene(st);
+  if (inRew) { X.save(); X.globalAlpha = .18; X.fillStyle = '#000'; for (let y = 0; y < H; y += 6) X.fillRect(0, y, W, 2); X.restore();
+    X.save(); X.globalCompositeOperation = 'lighter'; X.globalAlpha = .25; X.fillStyle = '#ff2040'; X.fillRect(0, (t * 2300) % H, W, 30); X.restore();
+    X.save(); X.font = '56px MO'; X.letterSpacing = '6px'; X.fillStyle = WHITE; X.shadowColor = '#fff'; X.shadowBlur = 14; X.fillText('◀◀ REWIND', 70, 380); X.restore(); }
+  if (!inRew) hud(d, st);
+  let vg = X.createRadialGradient(540, 1000, 500, 540, 1000, 1250); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.5)'); X.fillStyle = vg; X.fillRect(0, 0, W, H);
+  X.save(); X.globalAlpha = .045; X.drawImage(NOISE[Math.floor(t * 24) % 3], 0, 0, W, H); X.restore();
+  caption(t);
+  const ea = seg(t, T.end + .5, T.end + 1); if (ea > 0) { X.save(); X.globalAlpha = ea; X.fillStyle = 'rgba(225,220,205,.92)'; X.font = '34px MO'; X.letterSpacing = '6px'; X.textAlign = 'center'; X.fillText('@constara.app', W / 2 + 3, 1820); X.restore(); }
+};
+document.fonts.load('40px MO').then(() => document.fonts.ready).then(() => { window.draw(1.2); window.READY = true; });
+</script></body></html>
