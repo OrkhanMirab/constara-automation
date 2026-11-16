@@ -27,6 +27,36 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
    Qayda: gündəlik 2 Reels-in hər ikisi bu quruluşda, **hər dəfə yeni mövzu və yeni vizual dünya** (göl, dağ olub). ~26 s, diktorlu.
 8. **Qısa 11 s loop dayandırıldı** (11-16, n=2: M15, M07 — avg izləmə ən aşağı qrupda, reach baza). Qayıtmaq yalnız istifadəçi istəsə.
 
+9. **HƏR GÜN: 1 sübut olunmuş + 1 YENİ TİP video** (istifadəçi 11-16: «bütün videoları eyni tipdə paylaşma, hər zaman 1 yeni tip yoxla»).
+   - Slot A = qalib format (indi: bölünmüş ekran X vs Y, qayda 7), hər dəfə yeni mövzu/dünya.
+   - Slot B = **yeni tip** (əvvəl paylaşılmamış quruluş: chat/mesaj POV, telefon POV, Gün 1 vs Gün 365 tək kadr, sual-cavab, «sən hansısan?» seçim, siyahı-sayğac, hekayə 1-ci şəxs, xəritə/yol POV …) — həm də yeni mövzu.
+   - Hər yeni tip «Tip sınağı» cədvəlinə yazılır; 2 videoda bazadan ≥2× yaxşıdırsa → qaliblərə qoşulur (slot A-da növbələşir); 2 dəfə bazada qalırsa → atılır.
+10. **HƏR GÜN 2 YENİ SAAT** (istifadəçi 11-16: «hər gün 2 yeni vaxtı araşdır»). Plan faylına `"reels_times": ["HH:MM","HH:MM"]` yaz, «Saat sınağı» cədvəlindən ən az sınanmış 2 saatı götür
+    (hər saat ən azı 2 dəfə sınanana qədər; sonra ən yaxşı 4 saat arasında fırlat). `schedule.json` (15:00, 19:00) yalnız ehtiyatdır. Saat effektini formatdan ayırmaq üçün eyni saatı hər iki slot tipi ilə sına.
+
+## Saat sınağı (TR, reels; n = paylaşılan Reels sayı; qeyd = ~24 s reach medianı nisbəti bazaya, xam rəqəm yox)
+| saat | n (11-16-a qədər) | qeyd |
+|---|---|---|
+| 08:00–10:30 | 0 | sınanmayıb |
+| 11:00–12:30 | 3 | baza / aşağı |
+| 13:00 | 0 | 11-16 sınaq (M20) |
+| 14:00–15:30 | 8 | baza |
+| 16:00–16:30 | 0 | 11-16 sınaq (M22) |
+| 17:00–18:30 | 6 | baza (+ M14 partlayışı) |
+| 19:00 | 2 | M19 partlayışı (format?) |
+| 20:00–21:30 | 10 | baza |
+| 22:00–00:30 | 3 | baza / aşağı |
+Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:30 → 11:00 + 17:30 → 10:00 + 21:30 → 08:00 + 12:00 → sonra ən zəif n-li saatlar.
+
+## Tip sınağı (yeni tiplər)
+| tip | ilk video | nəticə |
+|---|---|---|
+| bölünmüş ekran X vs Y | M14, M19 | ✅ qalib (2/2) |
+| 11 s loop | M15, M07 | ❌ atıldı |
+| chat POV «gələcək sən yazır» | M22 (11-16, 16:30) | sınaqda |
+
+**Hazır növbə:** M21 «Zəngli saat» (bölünmüş ekran) `reels/2026-11-16/m21.mp4` — 11-17 slot A-da işlət (yenidən render lazım deyil).
+
 ## Bazada qalanlar (təkrar etmə, ən azı 2 həftə)
 sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyəti); weed (11-12: bazada + FB yükləməsi uğursuz — **narkotik mövzuları YOX**).
 

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:MO;src:url(file:///usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf)}
+@font-face{font-family:IN;src:url(file:///usr/share/fonts/opentype/inter/InterDisplay-Medium.otf)}
+@font-face{font-family:IB;src:url(file:///usr/share/fonts/opentype/inter/InterDisplay-Bold.otf)}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/*TL*/
+// M22 «Gələcək sən yazır» (11-16, YENİ TİP: chat POV). Bir il sonrakı «sən» bu gecə sənə yazır; mesajlar yazılır (typing…),
+// sonda qrafik şəkli (+355) mesaj kimi gəlir. Telefon ekranı = kadr, yuxarıda monospace caption.
+const T = window.TL, W = 1080, H = 1920, GOLD = '#F7C04A', RED = '#FF5A4A', WHITE = '#F4F1EA';
+const cv = document.getElementById('c'), X = cv.getContext('2d');
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)), lerp = (a, b, u) => a + (b - a) * u;
+const seg = (t, a, b) => clamp((t - a) / (b - a)), eout = u => 1 - Math.pow(1 - u, 3);
+const back = u => { const c = 1.6; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
+const R = k => { const x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const PX = 70, PY = 330, PW = 940, PH = 1440, BX = PX + 40, BW = 640, FS = 46, LH = 60;
+function wrap(txt, w, font) { X.font = font; const out = []; let line = '';
+  for (const wd of txt.split(' ')) { const tt = line ? line + ' ' + wd : wd; if (X.measureText(tt).width > w && line) { out.push(line); line = wd; } else line = tt; } out.push(line); return out; }
+function bubbleH(m) { return m.chart ? 430 : wrap(m.text, BW - 64, FS + 'px IN').length * LH + 44; }
+function chartImg(x, y, w, h, u) {
+  X.save(); X.beginPath(); X.roundRect(x, y, w, h, 26); X.clip(); X.fillStyle = '#0a0d14'; X.fillRect(x, y, w, h);
+  const hg = d => .95 * d + 10 * Math.sin(d / 7) - 34 / (1 + Math.exp(-(d - 30.5) * 2)) - 28 / (1 + Math.exp(-(d - 121) * 2));
+  const gx = d => x + 40 + d / 365 * (w - 80), gy = v => y + h - 60 - v / hg(365) * (h - 150);
+  X.strokeStyle = 'rgba(255,255,255,.12)'; X.setLineDash([6, 8]); X.lineWidth = 2; X.beginPath(); X.moveTo(x + 40, y + h - 60); X.lineTo(x + w - 40, y + h - 60); X.stroke(); X.setLineDash([]);
+  let g = X.createLinearGradient(0, y + 60, 0, y + h - 60); g.addColorStop(0, 'rgba(247,192,74,.25)'); g.addColorStop(1, 'rgba(247,192,74,0)'); X.fillStyle = g;
+  const D = 365 * eout(u); X.beginPath(); X.moveTo(gx(0), y + h - 60); for (let d = 0; d <= D; d++) X.lineTo(gx(d), gy(hg(d))); X.lineTo(gx(D), y + h - 60); X.fill();
+  X.lineWidth = 6; X.lineJoin = 'round'; X.shadowBlur = 16; let p = null;
+  for (let d = 0; d <= D; d++) { const q = [gx(d), gy(hg(d))], dip = [30.5, 121].some(c => Math.abs(d - c) < 2); if (p) { X.strokeStyle = dip ? RED : GOLD; X.shadowColor = X.strokeStyle; X.beginPath(); X.moveTo(...p); X.lineTo(...q); X.stroke(); } p = q; }
+  X.shadowBlur = 0; X.font = '24px MO'; X.fillStyle = 'rgba(220,220,220,.55)'; X.fillText('DAY 1', x + 34, y + h - 24); X.textAlign = 'right'; X.fillText('DAY 365', x + w - 34, y + h - 24);
+  X.font = '30px MO'; X.fillStyle = 'rgba(220,220,220,.8)'; X.textAlign = 'left'; X.fillText('MY YEAR', x + 34, y + 50);
+  X.font = '56px MO'; X.fillStyle = GOLD; X.shadowColor = GOLD; X.shadowBlur = 20; X.textAlign = 'right'; X.globalAlpha = seg(u, .7, 1); X.fillText('+355', x + w - 34, y + 70);
+  X.restore();
+}
+function bubble(m, y, a) {
+  const me = m.me, h = bubbleH(m), w = m.chart ? 560 : Math.min(BW, Math.max(...wrap(m.text, BW - 64, FS + 'px IN').map(l => (X.font = FS + 'px IN', X.measureText(l).width))) + 64);
+  const x = me ? PX + PW - 40 - w : BX, s = .85 + .15 * back(clamp(a * 1.4));
+  X.save(); X.globalAlpha = clamp(a * 3); X.translate(me ? x + w : x, y + h); X.scale(s, s); X.translate(-(me ? x + w : x), -(y + h));
+  if (m.chart) { X.fillStyle = '#1d222d'; X.beginPath(); X.roundRect(x, y, w, h, 34); X.fill(); chartImg(x + 12, y + 12, w - 24, h - 24, seg(a, .2, 1)); }
+  else { X.fillStyle = me ? GOLD : '#1f2430'; X.beginPath(); X.roundRect(x, y, w, h, 34); X.fill();
+    X.fillStyle = me ? '#14100a' : '#EDEFF3'; X.font = FS + 'px IN'; X.textBaseline = 'top'; wrap(m.text, BW - 64, FS + 'px IN').forEach((l, i) => X.fillText(l, x + 32, y + 22 + i * LH)); }
+  X.restore();
+}
+function typing(y, t, a) { X.save(); X.globalAlpha = a; X.fillStyle = '#1f2430'; X.beginPath(); X.roundRect(BX, y, 150, 84, 34); X.fill();
+  for (let i = 0; i < 3; i++) { X.fillStyle = `rgba(220,225,235,${.35 + .6 * Math.max(0, Math.sin(t * 7 - i * .9))})`; X.beginPath(); X.arc(BX + 42 + i * 33, y + 42, 10, 0, 7); X.fill(); } X.restore(); }
+function caption(t) {
+  for (const [a, b, txt, hi, hc] of T.texts) {
+    if (t < a || t > b) continue;
+    const al = Math.min(seg(t, a, a + .25), 1 - seg(t, b - .2, b)), lines = txt.split('\n');
+    X.save(); X.globalAlpha = al; X.font = '46px MO'; X.letterSpacing = '3px'; X.textBaseline = 'middle';
+    const y0 = 200 - (lines.length - 1) * 32 + (1 - eout(seg(t, a, a + .35))) * 12;
+    lines.forEach((ln, li) => { let x = W / 2 - X.measureText(ln).width / 2; const i = ln.indexOf(hi);
+      const parts = i < 0 ? [[ln, WHITE]] : [[ln.slice(0, i), WHITE], [hi, hc === 'red' ? RED : GOLD], [ln.slice(i + hi.length), WHITE]];
+      for (const [p, c] of parts) { if (!p) continue; X.fillStyle = c; X.shadowColor = c === WHITE ? 'rgba(0,0,0,.6)' : c; X.shadowBlur = c === WHITE ? 8 : 18; X.fillText(p, x, y0 + li * 64); x += X.measureText(p).width; } });
+    X.restore();
+  }
+}
+const NOISE = [0, 1, 2].map(k => { const c = document.createElement('canvas'); c.width = 540; c.height = 960; const x = c.getContext('2d'), d = x.createImageData(540, 960); for (let i = 0; i < d.data.length; i += 4) { const v = 128 + (R(i * .37 + k * 91.3) - .5) * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c; });
+window.draw = function (t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.shadowBlur = 0; X.letterSpacing = '0px';
+  let bg = X.createRadialGradient(540, 1100, 100, 540, 1100, 1300); bg.addColorStop(0, '#0d1220'); bg.addColorStop(1, '#030305'); X.fillStyle = bg; X.fillRect(0, 0, W, H);
+  // telefon ekranı
+  const zoom = 1 + .025 * seg(t, 0, T.dur);
+  X.save(); X.translate(540, 1050); X.scale(zoom, zoom); X.translate(-540, -1050);
+  X.save(); X.shadowColor = 'rgba(90,130,255,.35)'; X.shadowBlur = 80; X.fillStyle = '#090b10'; X.beginPath(); X.roundRect(PX, PY, PW, PH, 60); X.fill(); X.restore();
+  X.strokeStyle = 'rgba(255,255,255,.08)'; X.lineWidth = 3; X.beginPath(); X.roundRect(PX, PY, PW, PH, 60); X.stroke();
+  // başlıq: kontakt
+  X.fillStyle = '#0f121a'; X.beginPath(); X.roundRect(PX, PY, PW, 170, [60, 60, 0, 0]); X.fill();
+  const ax = PX + 110, ay = PY + 92; let ag = X.createLinearGradient(ax - 50, ay - 50, ax + 50, ay + 50); ag.addColorStop(0, GOLD); ag.addColorStop(1, '#FF6B35'); X.fillStyle = ag; X.beginPath(); X.arc(ax, ay, 48, 0, 7); X.fill();
+  X.fillStyle = '#14100a'; X.font = '40px IB'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText('Y', ax, ay + 2);
+  X.textAlign = 'left'; X.fillStyle = '#EDEFF3'; X.font = '44px IB'; X.fillText('You (1 year later)', ax + 74, ay - 20);
+  const typ = T.msgs.some(m => !m.me && t > m.t - .9 && t < m.t); X.font = '30px IN'; X.fillStyle = typ ? GOLD : '#7d8696'; X.fillText(typ ? 'typing…' : 'online', ax + 74, ay + 26);
+  X.fillStyle = '#7d8696'; X.font = '30px MO'; X.textAlign = 'right'; X.fillText('23:47', PX + PW - 50, ay); X.textAlign = 'left';
+  // mesajlar: aşağıdan yuxarı yığılır
+  X.save(); X.beginPath(); X.rect(PX, PY + 172, PW, PH - 172 - 150); X.clip();
+  const vis = T.msgs.filter(m => t >= m.t), bottom = PY + PH - 170;
+  let items = vis.map(m => ({ m, h: bubbleH(m), a: seg(t, m.t, m.t + .35) }));
+  const nxt = T.msgs.find(m => !m.me && t > m.t - .9 && t < m.t);
+  let y = bottom; if (nxt) { y -= 84; typing(y, t, seg(t, nxt.t - .9, nxt.t - .75)); y -= 22; }
+  for (let i = items.length - 1; i >= 0; i--) { const it = items[i], hh = it.h * eout(clamp(it.a * 2)); y -= hh; if (y + hh > PY + 172) bubble(it.m, y, it.a); y -= 22; }
+  X.restore();
+  // yazı sahəsi
+  X.fillStyle = '#0f121a'; X.beginPath(); X.roundRect(PX, PY + PH - 150, PW, 150, [0, 0, 60, 60]); X.fill();
+  X.fillStyle = '#1b1f29'; X.beginPath(); X.roundRect(PX + 40, PY + PH - 116, PW - 180, 80, 40); X.fill();
+  const draft = T.msgs.find(m => m.me && t > m.t - 1.2 && t < m.t), dtxt = draft ? draft.text.slice(0, Math.floor(draft.text.length * seg(t, draft.t - 1.1, draft.t - .15))) : '';
+  X.font = '38px IN'; X.fillStyle = dtxt ? '#EDEFF3' : '#5c6575'; X.textBaseline = 'middle'; X.fillText(dtxt || 'Message', PX + 80, PY + PH - 76);
+  if (dtxt && (t * 2) % 1 < .5) { const w = X.measureText(dtxt).width; X.fillStyle = GOLD; X.fillRect(PX + 84 + w, PY + PH - 98, 3, 44); }
+  X.fillStyle = draft ? GOLD : '#2a2f3a'; X.beginPath(); X.arc(PX + PW - 90, PY + PH - 76, 40, 0, 7); X.fill(); X.fillStyle = '#14100a'; X.font = '40px IB'; X.textAlign = 'center'; X.fillText('↑', PX + PW - 90, PY + PH - 74); X.textAlign = 'left';
+  X.restore();
+  let vg = X.createRadialGradient(540, 1000, 500, 540, 1000, 1250); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.45)'); X.fillStyle = vg; X.fillRect(0, 0, W, H);
+  X.save(); X.globalAlpha = .035; X.drawImage(NOISE[Math.floor(t * 24) % 3], 0, 0, W, H); X.restore();
+  caption(t);
+  const ea = seg(t, T.end + .5, T.end + 1); if (ea > 0) { X.save(); X.globalAlpha = ea; X.fillStyle = 'rgba(225,220,205,.92)'; X.font = '34px MO'; X.letterSpacing = '6px'; X.textAlign = 'center'; X.fillText('@constara.app', W / 2 + 3, 1850); X.restore(); }
+};
+document.fonts.load('40px MO').then(() => document.fonts.load('40px IN')).then(() => document.fonts.load('40px IB')).then(() => document.fonts.ready).then(() => { window.draw(1.2); window.READY = true; });
+</script></body></html>
