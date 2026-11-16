@@ -54,6 +54,7 @@ Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:3
 |---|---|---|
 | bölünmüş ekran X vs Y | M14, M19 | ✅ qalib (2/2) |
 | 11 s loop | M15, M07 | ❌ atıldı |
+| fasiləsiz kamera + fəsillər + REWIND loop | M23 (11-16 11:25, istifadəçi təsdiqi ilə) | sınaqda |
 | chat POV «gələcək sən yazır» | M22 (11-16) | ❌ istifadəçi RƏDD etdi (yalnız mətn, animasiya yox) — paylaşılmadı |
 
 M21 «Zəngli saat» 11-16 16:30-da M22-nin yerinə getdi.
