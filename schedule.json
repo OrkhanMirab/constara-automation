@@ -1,11 +1,11 @@
 {
-  "_izah": "Gundelik plan bu saatlara paylanir (TR, UTC+3). 2026-11-11: Meta reklam mehdudiyyetinden sonra istifadeci: 'tempi yungul saxlayaq, radara dusmeyek' -> gunde 2 Reels + 1 karusel, story yox. 11-11 axsam: karusel de legv (reach ~3%, istifadeci razi) -> gunde yalniz 2 Reels.",
+  "_izah": "Gundelik plan bu saatlara paylanir (TR, UTC+3). 2026-11-11: Meta reklam mehdudiyyetinden sonra istifadeci: 'tempi yungul saxlayaq, radara dusmeyek' -> gunde 2 Reels + 1 karusel, story yox. 11-11 axsam: karusel de legv (reach ~3%, istifadeci razi) -> gunde yalniz 2 Reels. 11-16: istifadeci 'en yaxsi vaxtlar' dedi -> 15:00, 19:00 (iki partlayis 18:26/19:02-de, 15 saati 14-den bir az yaxsi; n az, analizde yoxla).",
   "tz": "+03:00",
   "end": "23:00",
   "reels": {
     "times": [
-      "14:30",
-      "20:30"
+      "15:00",
+      "19:00"
     ]
   },
   "carousels": {
