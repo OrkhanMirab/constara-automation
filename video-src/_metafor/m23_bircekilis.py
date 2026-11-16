@@ -12,6 +12,7 @@ sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, '..', '_kino'))
 import sound as S  # noqa: E402
 
 FPS, DUR = 30, 27.0
+LACE, RUN = False, False
 DOWN, STAND, WALK, FALL, REVEAL, REW, REW2, END = 2.4, 2.9, 3.9, 7.05, 16.6, 20.2, 21.6, 23.6
 TEXTS = [
     (0.05, 2.30, "THIS IS THE NIGHT\nEVERYTHING CHANGED.", "EVERYTHING CHANGED.", "gold"),
@@ -27,7 +28,7 @@ VO = [(0.2, "This is the night everything changed."), (2.45, "He put the phone d
       (9.7, "Day ninety-five. Snow. He keeps going."), (12.7, "Day two hundred. Nobody's watching."), (16.7, "One year. One decision."),
       (21.7, "It all starts with tonight."), (23.8, "Send this to someone on the couch right now.")]
 TL = dict(fps=FPS, dur=DUR, days=[[0, 1], [WALK, 1], [7.0, 30], [7.8, 33], [9.6, 95], [11.2, 110], [12.6, 200], [14.2, 220], [15.8, 365]], down=DOWN, stand=STAND, walk=WALK,
-          fall=FALL, reveal=REVEAL, rew=REW, rew2=REW2, end=END, texts=TEXTS, stride=1.4)
+          fall=FALL, reveal=REVEAL, lace=LACE, run=RUN, rew=REW, rew2=REW2, end=END, texts=TEXTS, stride=1.4)
 
 
 def noise(n, seed):

@@ -38,15 +38,15 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 ## Saat sınağı (TR, reels; n = paylaşılan Reels sayı; qeyd = ~24 s reach medianı nisbəti bazaya, xam rəqəm yox)
 | saat | n (11-16-a qədər) | qeyd |
 |---|---|---|
-| 08:00–10:30 | 0 | sınanmayıb |
-| 11:00–12:30 | 3 | baza / aşağı |
-| 13:00 | 0 | 11-16 sınaq (M20) |
+| 08:00–10:30 | 0 | 11-17 09:00 sınaq (M25) |
+| 11:00–12:30 | 4 | baza / aşağı (11-16 M23 11:25: baza) |
+| 13:00 | 0 | 11-16 M20 IG xəta → ölçülmədi |
 | 14:00–15:30 | 8 | baza |
-| 16:00–16:30 | 0 | 11-16 sınaq (M21) |
+| 16:00–16:30 | 1 | 11-16 M21: baza (erkən) |
 | 17:00–18:30 | 6 | baza (+ M14 partlayışı) |
 | 19:00 | 2 | M19 partlayışı (format?) |
 | 20:00–21:30 | 10 | baza |
-| 22:00–00:30 | 3 | baza / aşağı |
+| 22:00–00:30 | 3 | baza / aşağı; 11-17 22:30 sınaq (M24) |
 Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:30 → 11:00 + 17:30 → 10:00 + 21:30 → 08:00 + 12:00 → sonra ən zəif n-li saatlar.
 
 ## Tip sınağı (yeni tiplər)
@@ -54,7 +54,7 @@ Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:3
 |---|---|---|
 | bölünmüş ekran X vs Y | M14, M19 | ✅ qalib (2/2) |
 | 11 s loop | M15, M07 | ❌ atıldı |
-| fasiləsiz kamera + fəsillər + REWIND loop | M23 (11-16 11:25, istifadəçi təsdiqi ilə) | sınaqda |
+| fasiləsiz kamera + fəsillər + REWIND loop | M23 (11-16, baza, avg aşağı), M25 (11-17 09:00) | sınaqda (2-ci video) |
 | chat POV «gələcək sən yazır» | M22 (11-16) | ❌ istifadəçi RƏDD etdi (yalnız mətn, animasiya yox) — paylaşılmadı |
 
 M21 «Zəngli saat» 11-16 16:30-da M22-nin yerinə getdi.
@@ -91,3 +91,4 @@ sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyə
 - 2026-11-14: M12 Masa share lideri; K01 silinib. Bugün M02 Buz kubu + M06 1% (diktorlu metafor, kamera geri çəkilməsi yeniliyi).
 - 2026-11-15: M13 avg 13.5 s lider; M02 IG ProcessingFailedError → yalnız IG-yə təkrar. Bugün M02 (IG) + M07 loop.
 - 2026-11-16: M19 Göl partladı (bölünmüş ekran 2/2). Qısa loop (M07, M15) zəif → dayandırıldı. Bugün M20 Divar (builder vs scroller) + M21 Zəngli saat (early vs snoozer). İzləyici 79.
+- 2026-11-17: M23 baza; M21 erkən baza; M20 IG ProcessingFailedError → yalnız IG təkrar (faststart, profile high). Bugün M25 (M23 formatı) 09:00 + M24 Ştanq 22:30. İzləyici 79.

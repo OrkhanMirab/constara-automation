@@ -7,7 +7,7 @@ html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}
 <canvas id="c" width="1080" height="1920"></canvas>
 <script>
 /*TL*/
-// M23 «Bir çəkiliş» (11-16, YENİ TİP): fasiləsiz kamera. Divanda telefon → telefonu qoyur, qalxır, kamera kəsilmədən onunla gedir;
+// M23/M25 «Bir çəkiliş» (TL.lace = ayaqqabı bağlayır, TL.run = qaçır) (11-16, YENİ TİP): fasiləsiz kamera. Divanda telefon → telefonu qoyur, qalxır, kamera kəsilmədən onunla gedir;
 // fəsillər axır (yağış → qar → çiçək → yay şəfəqi), iz = qrafik, Day 30 yıxılır (−5); zirvədə geri çəkilmə (+355); REWIND → yenə divan (loop).
 const T = window.TL, W = 1080, H = 1920, P1 = 330, P2 = 1050, PH = 660, PX = 30, PW = 1020;
 const cv = document.getElementById('c'), X = cv.getContext('2d');
@@ -199,14 +199,15 @@ function room(t, a) {
   X.beginPath(); X.roundRect(sx(SX - .85), sy(1.15), .28 * C.s, 1.0 * C.s, 16); X.fill();
   X.restore();
 }
-function sitPose(look) { return { hip: [SX - .25, .66], lean: lerp(-.22, -.05, look), head: lerp(.6, -.15, look), fN: [SX + .34, ANK, 0], fF: [SX + .24, ANK, 0], hN: [lerp(.36, .3, look), lerp(.02, -.2, look)], hF: [lerp(.33, .2, look), lerp(0, -.3, look)] }; }
+function sitPose(look) { if (T.lace) { const w = .03 * Math.sin(performance.now ? 0 : 0); return { hip: [SX - .25, .66], lean: lerp(.75, .1, look), head: lerp(.45, -.1, look), fN: [SX + .34, ANK, 0], fF: [SX + .24, ANK, 0], hN: [lerp(.3, .25, look), lerp(-.62, -.3, look)], hF: [lerp(.25, .2, look), lerp(-.6, -.35, look)] }; }
+  return { hip: [SX - .25, .66], lean: lerp(-.22, -.05, look), head: lerp(.6, -.15, look), fN: [SX + .34, ANK, 0], fF: [SX + .24, ANK, 0], hN: [lerp(.36, .3, look), lerp(.02, -.2, look)], hF: [lerp(.33, .2, look), lerp(0, -.3, look)] }; }
 function walkerPose(t, d) {
-  if (t < T.stand) return { p: sitPose(seg(t, T.down - .4, T.down)), x: SX - .25, phone: 1 - seg(t, T.down - .2, T.down + .3) };
+  if (t < T.stand) { const p = sitPose(seg(t, T.down - .4, T.down)); if (T.lace) { const k = .05 * Math.sin(t * 14) * (1 - seg(t, T.down - .4, T.down)); p.hN = [p.hN[0] + k, p.hN[1]]; p.hF = [p.hF[0] - k, p.hF[1]]; } return { p, x: SX - .25, phone: T.lace ? 0 : 1 - seg(t, T.down - .2, T.down + .3) }; }
   const x = t < T.walk ? lerp(SX - .25, SX + .3, seg(t, T.stand, T.walk)) : Math.max(SX + .3, lerp(SX + .3, xOf(d), seg(t, T.walk, T.walk + 1.2)));
   const dd = .02, sp = Math.abs(xOf(dayAt(t + dd)) - xOf(dayAt(t))) / dd;
   if (t < T.walk) { const u = eio(seg(t, T.stand, T.walk)); return { p: bl(sitPose(1), walkPose(x, 0, false), u), x, phone: 0 }; }
-  const amp = clamp(.4 + sp / 2), p = walkPose(x, amp, false);
-  if (sp > 2.2) { const ph = x / T.stride * Math.PI * 2; p.lean = .22 + slopeA(x) * .4; p.hN = [.04 + .2 * Math.sin(-ph), -.4]; p.hF = [.04 + .2 * Math.sin(ph), -.4]; }
+  const amp = T.run ? 1 : clamp(.4 + sp / 2), p = walkPose(x, amp, false);
+  if (sp > 2.2 || T.run) { const ph = x / T.stride * Math.PI * 2; p.lean = .22 + slopeA(x) * .4; p.hN = [.04 + .2 * Math.sin(-ph), -.4]; p.hF = [.04 + .2 * Math.sin(ph), -.4]; }
   const fall = bump(t, T.fall, .45);
   if (fall > .01) { const g = ROAD(x), kneel = { hip: [x - .1, g + .55], lean: .65, head: .3, fN: [x + .35, g + ANK, slopeA(x)], fF: [x - .55, g + .06, slopeA(x) + 1.2], hN: [.35, -.45], hF: [.3, -.5] }; return { p: bl(p, kneel, fall), x, phone: 0, fall }; }
   return { p, x, phone: 0 };
