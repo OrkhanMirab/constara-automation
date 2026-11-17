@@ -10,6 +10,8 @@
       Böyük dəyişiklik (yeni video şablonu/format, gündəlik say/saat) — yalnız «Sınaqda / təkliflər»-ə yaz və sonda istifadəçiyə bildir.
    f. Aşağıdakı plan **oyrenilenler.md «Aktiv qaydalar»**-a əməl edir; ziddiyyət olsa, oyrenilenler.md qalib gəlir.
 
+**⭐⭐ 11-17-dən: hər yeni ssenari `.claude/skills/ssenari/SKILL.md` ilə yazılır** (işıqlı, sadə, hamıya aydın; qara fon/siluet üslubu köhnədir). Aşağıdakı «qara fon + ağ fiqur» qeydi ləğv edilib.
+
 **⭐ 11-13-dən: YALNIZ METAFOR ÜSLUBU** (CLAUDE.md «⭐ YALNIZ METAFOR ÜSLUBU»). Aşağıdakı 3 signs / Xal / Kino / karusel bölmələri köhnədir — işlətmə. 2 Reels (14:30, 20:30), hər biri `video-src/_metafor/`-da yeni original metafor (ideyalar.md-dən və ya yeni), qara fon + ağ fiqur.
 
 1. Tarix: Türkiyə saatı ilə bugün (UTC+3). Fayl: `plan/<tarix>.json`. Varsa — toxunma, yalnız yoxla.

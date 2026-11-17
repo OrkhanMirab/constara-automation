@@ -11,6 +11,9 @@ Constara tətbiqinin sosial şəbəkə avtomatlaşdırması. Hazırda **@constar
 - «Avtomatik plan bu qaydaya düşmür» istisnası yeni tiplər üçün LƏĞV edilib. İstisna yalnız artıq təsdiqlənmiş formatın (bölünmüş ekran 2D siluet) yeni mövzusudur.
 - Pozuntu (11-16): M22 chat POV önizləməsiz render olundu və plana yazıldı → istifadəçi rədd etdi («ancaq mətn oxuyacaq insanlar», animasiya istəyir). Chat/mətn ekranı tipli videolar RƏDD.
 
+## 💡 SSENARİ SKILL-İ (istifadəçi 11-17: «videolar çox qaranlıqdır, daha başa düşülən, bəsit, hamıya xitab edən»)
+Hər yeni video ssenarisi əvvəl `.claude/skills/ssenari/SKILL.md` qaydaları ilə yazılır: səssiz 3 s-də aydın, hamıya aid gündəlik vəziyyət, **işıqlı/gündüz səhnə (tam qara fon və yalnız siluet YOX)**, ekranda ≤1 qısa sətir. Bu, aşağıdakı «gecə, siluet, qara fon» üslub qeydlərindən ÜSTÜNDÜR.
+
 ## 🚀 Yeni sessiyanın başlanğıcı
 1. Bu faylı oxu (avtomatik yüklənir). «Yol xəritəsi» bölməsi növbəti işi göstərir (FB hazırdır; növbəti: yol xəritəsi §2).
 2. **Tətbiqin məlumatı lazımdırsa** (yeni funksiya postu, video mühərriki, strategiyanın tam mətni), `OrkhanMirab/Constara` reposunu
