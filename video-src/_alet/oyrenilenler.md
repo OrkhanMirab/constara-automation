@@ -38,16 +38,16 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 ## Saat sınağı (TR, reels; n = paylaşılan Reels sayı; qeyd = ~24 s reach medianı nisbəti bazaya, xam rəqəm yox)
 | saat | n (11-16-a qədər) | qeyd |
 |---|---|---|
-| 08:00–10:30 | 1 | 11-17 09:00 M25: reach baza, avg izləmə yaxşı |
-| 11:00–12:30 | 4 | baza / aşağı (11-16 M23 11:25: baza); 11-18 11:00 sınaq (M26) |
+| 08:00–10:30 | 1 | 11-17 09:00 M25: reach baza, avg izləmə yaxşı; 11-19 10:00 sınaq (M29) |
+| 11:00–12:30 | 4 | baza / aşağı (11-16 M23 11:25: baza); 11-18 11:00 M26: erkən ~1.2× |
 | 13:00 | 0 | 11-16 M20 IG xəta → ölçülmədi |
 | 14:00–15:30 | 9 | baza; 11-17 15:00 M20 IG təkrar ~2× (format?) |
 | 16:00–16:30 | 1 | 11-16 M21: baza (erkən) |
-| 17:00–18:30 | 6 | baza (+ M14 partlayışı); 11-18 17:30 sınaq (M27) |
+| 17:00–18:30 | 6 | baza (+ M14 partlayışı); 11-18 17:30 M27: erkən ~1.1× |
 | 19:00 | 2 | M19 partlayışı (format?) |
-| 20:00–21:30 | 10 | baza |
+| 20:00–21:30 | 10 | baza; 11-19 21:30 sınaq (M30) |
 | 22:00–00:30 | 4 | baza / aşağı; 11-17 22:30 M24: erkən baza |
-Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:30 (11-17) → 11:00 + 17:30 (11-18) → **10:00 + 21:30 (11-19)** → 08:00 + 12:00 → sonra ən zəif n-li saatlar.
+Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:30 (11-17) → 11:00 + 17:30 (11-18) → 10:00 + 21:30 (11-19) → **13:00 + 19:00 (11-20)** → 08:00 + 12:00 → 08:00 + 12:00 → sonra ən zəif n-li saatlar.
 
 ## Tip sınağı (yeni tiplər)
 | tip | ilk video | nəticə |
@@ -55,7 +55,7 @@ Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:3
 | bölünmüş ekran X vs Y | M14, M19 | ✅ qalib (2/2) |
 | 11 s loop | M15, M07 | ❌ atıldı |
 | fasiləsiz kamera + fəsillər + REWIND loop | M23 (11-16, baza, avg aşağı), M25 (11-17 09:00, avg izləmə ~2× M23) | reach baza 2/2 → qaliblərə qoşulmadı; avg izləmə yaxşı — atılmır, nadir hallarda |
-| **İŞIQLI üslub** (gündüz, rəngli personaj; ssenari skill-i) | M26, M27 (11-18, ikisi də bölünmüş ekran) | sınaqda: qaranlıq bölünmüş ekranla müqayisə |
+| **İŞIQLI üslub** (gündüz, rəngli personaj; ssenari skill-i) | M26, M27 (11-18), M29, M30 (11-19) — hamısı bölünmüş ekran | erkən: reach baza üstü (~1.1–1.2×), avg izləmə qaranlıqdan yaxşı → davam |
 | **tək sabit kadr TIMELAPSE** (işıqlı otaq, 365 gün, rəf dolur, plakat = qrafik) | M28 «10 səhifə» (11-18 önizləmə göndərildi) | 🛑 istifadəçi təsdiqi gözlənilir → təsdiqlənsə növbəti gecə render + plan (yeni tip slotu) |
 | chat POV «gələcək sən yazır» | M22 (11-16) | ❌ istifadəçi RƏDD etdi (yalnız mətn, animasiya yox) — paylaşılmadı |
 
@@ -93,5 +93,6 @@ sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyə
 - 2026-11-14: M12 Masa share lideri; K01 silinib. Bugün M02 Buz kubu + M06 1% (diktorlu metafor, kamera geri çəkilməsi yeniliyi).
 - 2026-11-15: M13 avg 13.5 s lider; M02 IG ProcessingFailedError → yalnız IG-yə təkrar. Bugün M02 (IG) + M07 loop.
 - 2026-11-16: M19 Göl partladı (bölünmüş ekran 2/2). Qısa loop (M07, M15) zəif → dayandırıldı. Bugün M20 Divar (builder vs scroller) + M21 Zəngli saat (early vs snoozer). İzləyici 79.
+- 2026-11-19: ilk işıqlı videolar (M26, M27) erkən baza üstü, avg izləmə ~9 s. M28 önizləməsi təsdiq gözləyir. Bugün M29 Banka 10:00 + M30 Pilləkən 21:30 (yenilik: pilləkən IK + kamera yuxarı izləyir). İzləyici 79.
 - 2026-11-18: M20 IG təkrarı ~2× (bölünmüş ekran 3/4), M25 avg izləmə yaxşı. İstifadəçi «çox qaranlıq» → ilk işıqlı videolar: M26 Velosiped 11:00 + M27 Gəzinti 17:30 (rəngli personaj palitrası `pal`, IK pedal — yenilik). İzləyici 80.
 - 2026-11-17: M23 baza; M21 erkən baza; M20 IG ProcessingFailedError → yalnız IG təkrar (faststart, profile high). Bugün M25 (M23 formatı) 09:00 + M24 Ştanq 22:30. İzləyici 79.
