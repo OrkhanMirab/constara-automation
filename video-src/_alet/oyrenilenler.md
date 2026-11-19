@@ -38,14 +38,14 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 ## Saat sınağı (TR, reels; n = paylaşılan Reels sayı; qeyd = ~24 s reach medianı nisbəti bazaya, xam rəqəm yox)
 | saat | n (11-16-a qədər) | qeyd |
 |---|---|---|
-| 08:00–10:30 | 1 | 11-17 09:00 M25: reach baza, avg izləmə yaxşı; 11-19 10:00 sınaq (M29) |
+| 08:00–10:30 | 2 | 11-17 09:00 M25: reach baza, avg izləmə yaxşı; 11-19 10:00 M29: baza |
 | 11:00–12:30 | 4 | baza / aşağı (11-16 M23 11:25: baza); 11-18 11:00 M26: erkən ~1.2× |
 | 13:00 | 0 | 11-16 M20 IG xəta → ölçülmədi |
 | 14:00–15:30 | 9 | baza; 11-17 15:00 M20 IG təkrar ~2× (format?) |
 | 16:00–16:30 | 1 | 11-16 M21: baza (erkən) |
 | 17:00–18:30 | 6 | baza (+ M14 partlayışı); 11-18 17:30 M27: erkən ~1.1× |
 | 19:00 | 2 | M19 partlayışı (format?) |
-| 20:00–21:30 | 10 | baza; 11-19 21:30 sınaq (M30) |
+| 20:00–21:30 | 11 | baza; 11-19 21:30 M30: erkən baza, avg izləmə yaxşı |
 | 22:00–00:30 | 4 | baza / aşağı; 11-17 22:30 M24: erkən baza |
 Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:30 (11-17) → 11:00 + 17:30 (11-18) → 10:00 + 21:30 (11-19) → **13:00 + 19:00 (11-20)** → 08:00 + 12:00 → 08:00 + 12:00 → sonra ən zəif n-li saatlar.
 
@@ -55,7 +55,9 @@ Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:3
 | bölünmüş ekran X vs Y | M14, M19 | ✅ qalib (2/2) |
 | 11 s loop | M15, M07 | ❌ atıldı |
 | fasiləsiz kamera + fəsillər + REWIND loop | M23 (11-16, baza, avg aşağı), M25 (11-17 09:00, avg izləmə ~2× M23) | reach baza 2/2 → qaliblərə qoşulmadı; avg izləmə yaxşı — atılmır, nadir hallarda |
-| **İŞIQLI üslub** (gündüz, rəngli personaj; ssenari skill-i) | M26, M27 (11-18), M29, M30 (11-19) — hamısı bölünmüş ekran | erkən: reach baza üstü (~1.1–1.2×), avg izləmə qaranlıqdan yaxşı → davam |
+| **İŞIQLI üslub** (gündüz, rəngli personaj; ssenari skill-i) | M26, M27 (11-18), M29, M30 (11-19) — hamısı bölünmüş ekran | n=4: reach baza (~1.0–1.2×), partlayış yox; avg izləmə qaranlıqdan yaxşı; share ~0 → saxlayır, itələnmir |
+| **psixologiya «adlı effekt»** (maskot) | M32 Spotlight (11-20 15:00, istifadəçi təsdiqi) | sınaqda |
+| **finans «kiçik xərc → böyük rəqəm»** (motion, kinetik rəqəm) | M31 Latte (11-20 19:00, istifadəçi təsdiqi) | sınaqda |
 | **tək sabit kadr TIMELAPSE** (işıqlı otaq, 365 gün, rəf dolur, plakat = qrafik) | M28 «10 səhifə» (11-18 önizləmə göndərildi) | 🛑 istifadəçi təsdiqi gözlənilir → təsdiqlənsə növbəti gecə render + plan (yeni tip slotu) |
 | chat POV «gələcək sən yazır» | M22 (11-16) | ❌ istifadəçi RƏDD etdi (yalnız mətn, animasiya yox) — paylaşılmadı |
 
@@ -87,6 +89,7 @@ sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyə
 - **M14 «Fənər» ilk dəfə ~130 tavanını keçdi (11-15, n=1).** vape videosundan (11-09) sonra 16-cı Reels. İlk 10 saatda bütün metaforlar kimi ~130-da dayandı, sonra **ikinci dalğa** (10→17 s arası reach ~+35%), gec gələn izləyicilər daha uzun baxdı. Share/save 0 → itələyən siqnal göndərmə yox, **izləmə müddəti + geniş mövzu** (perfeksionizm/«just start» — niş yox, hamıya aid). Güclü tərəflər: bölünmüş ekranda **iki personajın qarşıdurması** (izləyici «mən hansıyam?» deyir), daima artan sayğaclar (DAY, SCORE, PLAN vN) → sonu görmək istəyi, sonda geri çəkilmə ilə «iz = qrafik» açılışı, caption-un 1-ci sətri əmr («Stop waiting for the perfect plan. Start with a bad one.»). Qayda (sınaq): **«X vs Y» qarşıdurma + sayğac + son açılış** quruluşunu digər mövzularda da sına (səhər vs gecə, scroll vs build). M17 «Yol» = eyni hekayə, 3D premium mühərrik (`m17_yol.py`, three.js).
 
 ## Tarixçə
+- 2026-11-20: işıqlı bölünmüş ekran n=4 hamısı ~baza, avg izləmə yaxşı, share 0 (son 8 Reels). İzləyici artımı dayanıb (78). Bugün istifadəçinin yeni strategiyası: M32 psixologiya + M31 finans (15:00, 19:00).
 - 2026-11-11: ilk analiz (29 post, 61 izləyici). Qaydalar 1–4 yazıldı.
 - 2026-11-12: dünənki 4 post erkən (bazada). Xal testi #1 avg izləmə «3 signs» səviyyəsində. Açıq döngə sınağı + narkotik mövzusu qadağası. İzləyici 66.
 - 2026-11-13: hamısı ~110 bazada (3 signs, Xal #1, Metafor M10); Kino K02 erkən zəif (avg 4.4 s, 6 s). İzləyici 74 (+8). Yenilik: Xal canlı sayğac.
