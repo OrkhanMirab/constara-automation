@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:IB;src:url(file:///usr/share/fonts/opentype/inter/Inter-Bold.otf)}
+@font-face{font-family:IM;src:url(file:///usr/share/fonts/opentype/inter/Inter-Medium.otf)}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/*TL*/
+// M32 «Spotlight Effect» (11-19) — PSİXOLOGİYA seriyası #1, maskot «blob» personajlar (konturlu stiker üslubu), M31 motion dili.
+const T = window.TL, W = 1080, H = 1920, S = T.s;
+const cv = document.getElementById('c'), X = cv.getContext('2d');
+const INK = '#1E2533', CREAM = '#FBF3E6', ORANGE = '#FF6B35', GREEN = '#17A862', GREY = '#8E97A3', RED = '#E5484D';
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, u) => a + (b - a) * u;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const eout = u => 1 - Math.pow(1 - clamp(u), 3);
+const eio = u => { u = clamp(u); return u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
+const spring = (u, k = 7, f = 11) => u <= 0 ? 0 : 1 - Math.exp(-k * u) * Math.cos(f * u);
+const R = k => { const x = Math.sin(k * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+function words(str, cx, y, size, t, t0, t1, col, hi) {
+  const ws = str.split(' '); X.font = `${size}px IB`;
+  const sp = size * .28, wid = ws.map(w => X.measureText(w).width);
+  let x = cx - (wid.reduce((a, b) => a + b, 0) + sp * (ws.length - 1)) / 2;
+  ws.forEach((w, i) => {
+    const a = spring(t - t0 - i * .07), out = eio(seg(t, t1 - .25 + i * .03, t1 + .05 + i * .03));
+    if (a <= 0 || out >= 1) { x += wid[i] + sp; return; }
+    X.save(); X.globalAlpha = clamp(a * 1.6) * (1 - out);
+    X.translate(x + wid[i] / 2, y + (1 - a) * size * .9 - out * size * .8);
+    X.scale(lerp(.6, 1, clamp(a)), lerp(.6, 1, clamp(a)));
+    X.fillStyle = hi && hi.includes(w) ? hi[hi.length - 1] : col; X.textAlign = 'center'; X.textBaseline = 'middle';
+    X.fillText(w, 0, 0); X.restore(); x += wid[i] + sp;
+  });
+}
+function caption(t) {
+  for (const [a, b, s, sz, hi] of T.texts) if (t > a - .1 && t < b + .3)
+    s.split('|').forEach((ln, i, L) => words(ln, W / 2, 330 + (i - (L.length - 1) / 2) * sz * 1.15, sz, t, a + i * .18, b, INK, hi));
+}
+
+// ---------- maskot ----------
+// o: look [dx,dy], walk faza, stain 0..1, mood 'smile'|'worry'|'calm', blush, item, hop
+function blob(x, y, s, col, o = {}) {
+  X.save(); X.translate(x, y - (o.hop || 0)); X.scale(s * (o.flip ? -1 : 1), s);
+  X.lineWidth = 7; X.strokeStyle = INK; X.lineCap = 'round'; X.lineJoin = 'round';
+  const w = o.walk || 0, sw = Math.sin(w) * 18, bob = Math.abs(Math.cos(w)) * (o.walk ? 6 : 0);
+  X.fillStyle = 'rgba(30,37,51,.12)'; X.beginPath(); X.ellipse(0, 4, 80, 14, 0, 0, 7); X.fill();
+  X.beginPath(); X.moveTo(-26, -30); X.lineTo(-26 + sw, -2); X.lineTo(-40 + sw, -2); X.stroke();   // ayaqlar
+  X.beginPath(); X.moveTo(26, -30); X.lineTo(26 - sw, -2); X.lineTo(12 - sw, -2); X.stroke();
+  X.translate(0, -bob);
+  X.fillStyle = col; X.beginPath(); X.ellipse(0, -110, 76, 92, 0, 0, 7); X.fill(); X.stroke();       // bədən
+  X.save(); X.clip(); X.fillStyle = 'rgba(30,37,51,.10)'; X.beginPath(); X.ellipse(40, -100, 60, 100, 0, 0, 7); X.fill();
+  X.fillStyle = 'rgba(255,255,255,.35)'; X.beginPath(); X.ellipse(-36, -160, 18, 26, -.4, 0, 7); X.fill(); X.restore();
+  if (o.stain > 0) {                                                                                 // qəhvə ləkəsi
+    const r = 30 * o.stain; X.fillStyle = '#7A4A2A'; X.beginPath();
+    for (let k = 0; k <= 14; k++) { const a = k / 14 * 6.283, rr = r * (1 + .3 * Math.sin(a * 5 + 1)); X.lineTo(14 + Math.cos(a) * rr, -70 + Math.sin(a) * rr * .8); }
+    X.fill(); X.beginPath(); X.ellipse(4, -70 + r * .9 + 10 * o.stain, 6 * o.stain, 10 * o.stain, 0, 0, 7); X.fill();
+  }
+  const lk = o.look || [0, 0];
+  for (const ex of [-26, 26]) {                                                                      // gözlər
+    X.fillStyle = '#fff'; X.beginPath(); X.ellipse(ex, -128, 22, 25, 0, 0, 7); X.fill(); X.lineWidth = 5; X.stroke();
+    X.fillStyle = INK; X.beginPath(); X.arc(ex + lk[0] * 9, -126 + lk[1] * 9, 10, 0, 7); X.fill();
+    X.fillStyle = '#fff'; X.beginPath(); X.arc(ex + lk[0] * 9 + 3, -130 + lk[1] * 9, 3.5, 0, 7); X.fill();
+  }
+  X.lineWidth = 6;
+  if (o.mood === 'worry') {                                                                          // qaşlar + ağız
+    X.beginPath(); X.moveTo(-46, -160); X.lineTo(-12, -172); X.moveTo(46, -160); X.lineTo(12, -172); X.stroke();
+    X.beginPath(); for (let k = 0; k <= 8; k++) X.lineTo(-20 + k * 5, -84 + (k % 2 ? -5 : 5)); X.stroke();
+  } else if (o.mood === 'calm') { X.beginPath(); X.moveTo(-14, -86); X.lineTo(14, -86); X.stroke(); }
+  else { X.beginPath(); X.arc(0, -96, 20, .2 * Math.PI, .8 * Math.PI); X.stroke(); }
+  if (o.blush) { X.fillStyle = `rgba(255,90,90,${.45 * o.blush})`; for (const bx of [-50, 50]) { X.beginPath(); X.ellipse(bx, -98, 14, 8, 0, 0, 7); X.fill(); } }
+  if (o.item) item(o.item, o.t || 0);
+  X.restore();
+}
+function item(k, t) {           // hər kəsin «öz işığı»: öz dərdi
+  X.lineWidth = 6; X.strokeStyle = INK;
+  if (k === 'phone') { X.fillStyle = INK; X.beginPath(); X.roundRect(56, -150, 44, 76, 8); X.fill(); X.fillStyle = '#9FE6FF'; X.fillRect(62, -143, 32, 58);
+    X.beginPath(); X.moveTo(64, -40); X.lineTo(78, -80); X.stroke(); }
+  if (k === 'mirror') { X.beginPath(); X.moveTo(76, -40); X.lineTo(82, -110); X.stroke(); X.fillStyle = '#DDF3FF'; X.beginPath(); X.ellipse(84, -146, 30, 36, 0, 0, 7); X.fill(); X.stroke(); }
+  if (k === 'paper') { X.fillStyle = '#fff'; X.save(); X.translate(78, -120); X.rotate(.15 + .05 * Math.sin(t * 8)); X.beginPath(); X.rect(-30, -40, 60, 80); X.fill(); X.stroke();
+    X.lineWidth = 4; for (let i = 0; i < 4; i++) { X.beginPath(); X.moveTo(-18, -24 + i * 16); X.lineTo(18, -24 + i * 16); X.stroke(); } X.restore(); }
+  if (k === 'hair') { X.beginPath(); for (let i = 0; i < 3; i++) { X.moveTo(-14 + i * 14, -200); X.quadraticCurveTo(-24 + i * 14 + Math.sin(t * 9 + i) * 8, -236, -6 + i * 14, -250); } X.stroke(); }
+  if (k === 'zit') { X.fillStyle = RED; X.beginPath(); X.arc(-50, -86, 9, 0, 7); X.fill(); }
+  if (k === 'cup') { X.fillStyle = '#fff'; X.beginPath(); X.moveTo(70, -120); X.lineTo(110, -120); X.lineTo(104, -64); X.lineTo(76, -64); X.closePath(); X.fill(); X.stroke();
+    X.fillStyle = ORANGE; X.fillRect(76, -104, 30, 16); X.beginPath(); X.moveTo(80, -64); X.lineTo(66, -40); X.stroke(); }
+}
+function bubble(x, y, txt, a, col) {
+  if (a <= 0) return; X.save(); X.translate(x, y); X.scale(clamp(a, 0, 1.2), clamp(a, 0, 1.2)); X.globalAlpha = clamp(a * 1.5);
+  X.font = '52px IB'; const w = X.measureText(txt).width + 50;
+  X.fillStyle = '#fff'; X.strokeStyle = col; X.lineWidth = 6; X.beginPath(); X.roundRect(-w / 2, -48, w, 90, 45); X.fill(); X.stroke();
+  X.beginPath(); X.moveTo(-10, 42); X.lineTo(0, 66); X.lineTo(14, 42); X.fill();
+  X.fillStyle = col; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText(txt, 0, 0); X.restore();
+}
+
+// izdiham: [x, y(ayaq), ölçü, rəng, dərd, imagined bubble]
+const CROWD = [[215, 1140, .95, '#3CC2B4', 'phone', 'LOL'], [430, 1090, .88, '#9B7BEA', 'mirror', 'EW'], [665, 1090, .9, '#F6C945', 'paper', '?!'],
+  [870, 1140, .97, '#F58BB0', 'hair', 'OMG'], [190, 1600, 1.1, '#5AA9F0', 'zit', 'HA'], [890, 1600, 1.08, '#6BCB77', 'phone', 'LOOK']];
+const HERO = '#FF8A4C';
+
+function room(t, dark) {
+  const g = X.createLinearGradient(0, 560, 0, 1720); g.addColorStop(0, '#FCE9D2'); g.addColorStop(1, '#F7DDBF');
+  X.fillStyle = CREAM; X.fillRect(0, 0, W, H); X.fillStyle = g; X.fillRect(-200, 560, W + 400, 700);
+  X.fillStyle = '#EFCFAA'; X.fillRect(-200, 1250, W + 400, 700);                 // döşəmə
+  X.fillStyle = 'rgba(30,37,51,.06)'; for (let i = -6; i < 14; i++) { X.beginPath(); X.moveTo(i * 120, 1250); X.lineTo(i * 220 - 500, 1900); X.lineTo(i * 220 - 490, 1900); X.lineTo(i * 120 + 4, 1250); X.fill(); }
+  X.fillStyle = '#BFE6F5'; X.strokeStyle = INK; X.lineWidth = 7; X.beginPath(); X.roundRect(380, 640, 320, 240, 16); X.fill(); X.stroke();   // pəncərə
+  X.beginPath(); X.moveTo(540, 640); X.lineTo(540, 880); X.moveTo(380, 760); X.lineTo(700, 760); X.stroke();
+  X.fillStyle = '#FFF6A8'; X.beginPath(); X.arc(630, 700, 30, 0, 7); X.fill();
+}
+
+window.draw = function (t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1;
+  const imag = eio(seg(t, S.stare, S.stare + .5)) * (1 - eio(seg(t, S.wrong + .5, S.reveal + .2)));   // xəyali rejim
+  const real = eio(seg(t, S.reveal, S.reveal + .8));
+  const z = 1 + .3 * eio(seg(t, S.stare, S.stare + 1.6)) * (1 - eio(seg(t, S.reveal, S.reveal + 1.2)));
+  const shake = (Math.exp(-Math.max(0, t - S.spill) * 12) * (t > S.spill) + Math.exp(-Math.max(0, t - S.wrong) * 10) * (t > S.wrong) * 1.6) * 10;
+  // qəhrəman yeri
+  const hx = t < S.relax + .6 ? lerp(-120, 540, eout(seg(t, .1, S.spill - .05))) : lerp(540, 540, 0), hy = 1480;
+  X.save(); X.translate(W / 2 + Math.sin(t * 63) * shake, 1300 + Math.cos(t * 51) * shake); X.scale(z, z); X.translate(-hx, -1300 + (z - 1) * 120);
+  room(t);
+  // izdiham
+  CROWD.forEach(([x, y, s, c, it, bb], k) => {
+    const lookHero = [clamp((hx - x) / 300, -1, 1), clamp((hy - 120 - y) / 500, -1, 1) * .6];
+    const ownLook = it === 'hair' ? [0, -1] : it === 'zit' ? [-.8, .4] : [1, -.3];
+    const lk = real > .5 ? ownLook : imag > .5 ? lookHero : [Math.sin(t + k) * .5, 0];
+    if (real > 0) {             // hər kəsin öz spot işığı
+      X.save(); X.globalAlpha = real * .55; const cg = X.createLinearGradient(0, y - 520, 0, y);
+      cg.addColorStop(0, 'rgba(255,240,170,0)'); cg.addColorStop(1, 'rgba(255,236,150,.9)'); X.fillStyle = cg;
+      X.beginPath(); X.moveTo(x - 30 * s, y - 520); X.lineTo(x + 30 * s, y - 520); X.lineTo(x + 110 * s, y); X.lineTo(x - 110 * s, y); X.fill();
+      X.fillStyle = 'rgba(255,236,150,.9)'; X.beginPath(); X.ellipse(x, y + 2, 110 * s, 20 * s, 0, 0, 7); X.fill(); X.restore();
+    }
+    blob(x, y, s * (1 + (imag > 0 ? .04 * Math.sin(t * 6 + k) * imag : 0)), c,
+      { look: lk, mood: real > .5 ? 'worry' : 'smile', item: real > .5 ? it : null, t, hop: real > .5 ? Math.abs(Math.sin(t * 3 + k)) * 6 : 0, flip: x > 540 && real > .5 });
+  });
+  // xəyali qaralma (qəhrəmanın ətrafında dəlik) — tam qara YOX
+  if (imag > 0) {
+    X.save(); X.globalAlpha = imag * .55; X.fillStyle = '#2B2340'; X.beginPath(); X.rect(-400, 0, W + 800, H + 400);
+    X.moveTo(hx + 250, hy - 110); X.ellipse(hx, hy - 130, 250, 300, 0, 0, 7, true); X.fill('evenodd'); X.restore();
+    X.save(); X.globalAlpha = imag * .35; const sg = X.createLinearGradient(0, 500, 0, hy); sg.addColorStop(0, 'rgba(255,240,170,0)'); sg.addColorStop(1, 'rgba(255,240,170,1)');
+    X.fillStyle = sg; X.beginPath(); X.moveTo(hx - 60, 500); X.lineTo(hx + 60, 500); X.lineTo(hx + 210, hy); X.lineTo(hx - 210, hy); X.fill(); X.restore();
+    CROWD.forEach(([x, y, s, c, it, bb], k) => {        // izdihamın gözləri qaranlıqda parlayır + baloncuklar
+      bubble(x + (x < 540 ? 40 : -40), y - 260 * s, bb, spring(t - S.bubbles - k * .22, 8, 13) * (1 - eio(seg(t, S.wrong, S.wrong + .3))), RED);
+    });
+  }
+  // qəhrəman
+  const spilled = seg(t, S.spill, S.spill + .35), relax = seg(t, S.relax, S.relax + .4);
+  const walking = t < S.spill - .05 || (t > S.cta && t < DUR_END());
+  const exitX = t > S.cta ? lerp(0, 0, 0) : 0;
+  blob(hx + exitX, hy, 1.4, HERO, {
+    look: real > .5 && relax < 1 ? [Math.sin(t * 2) * .9, 0] : imag > .2 ? [Math.sin(t * 11) * .6, -.2] : spilled > 0 && spilled < 1 ? [0, 1] : [.2, 0],
+    walk: t < S.spill - .05 ? t * 11 : 0, stain: eout(spilled), mood: relax > .5 ? 'smile' : spilled > .2 ? 'worry' : 'smile',
+    blush: clamp(imag + spilled * .6 - relax), item: t < S.spill + .2 ? 'cup' : null, hop: relax > 0 ? Math.abs(Math.sin((t - S.relax) * 7)) * 30 * (1 - seg(t, S.relax + 1.6, S.relax + 2.2)) : 0
+  });
+  if (spilled > 0 && spilled < 1) {                     // sıçrayan damcılar
+    for (let i = 0; i < 9; i++) { const a = -1.2 - R(i) * 1.6, v = 220 + R(i + 4) * 200, u = spilled;
+      X.fillStyle = '#7A4A2A'; X.beginPath(); X.arc(hx + 100 + Math.cos(a) * v * u, hy - 130 + Math.sin(a) * v * u + 500 * u * u, 10 * (1 - u * .5), 0, 7); X.fill(); }
+  }
+  X.restore();
+  // «WRONG» flaşı
+  const fl = Math.exp(-Math.max(0, t - S.wrong) * 8) * (t > S.wrong); if (fl > .01) { X.fillStyle = `rgba(255,255,255,${fl * .8})`; X.fillRect(0, 0, W, H); }
+  // statistika kartı
+  const ca = spring(t - S.stat, 6, 10) * (1 - eio(seg(t, S.relax - .3, S.relax + .1)));
+  if (ca > 0) {
+    X.save(); X.fillStyle = `rgba(251,243,230,${clamp(ca) * .75})`; X.fillRect(0, 0, W, H);
+    X.translate(540, 1150); X.scale(lerp(.7, 1, clamp(ca)), lerp(.7, 1, clamp(ca))); X.globalAlpha = clamp(ca * 1.5);
+    X.fillStyle = 'rgba(30,37,51,.10)'; X.beginPath(); X.roundRect(-430, -300, 880, 620, 44); X.fill();
+    X.fillStyle = '#fff'; X.strokeStyle = INK; X.lineWidth = 7; X.beginPath(); X.roundRect(-440, -320, 880, 620, 44); X.fill(); X.stroke();
+    X.fillStyle = GREY; X.font = '36px IB'; X.textAlign = 'left'; X.textBaseline = 'middle'; X.fillText('PEOPLE WHO NOTICED YOUR SHIRT', -380, -240);
+    [['YOU THINK', 50, ORANGE, S.stat + .4], ['REALITY', 25, GREEN, S.stat + 1.6]].forEach(([lb, v, c, t0], i) => {
+      const u = eout(seg(t, t0, t0 + .9)), y0 = -120 + i * 210;
+      X.fillStyle = INK; X.font = '44px IB'; X.textAlign = 'left'; X.fillText(lb, -380, y0);
+      X.fillStyle = '#F1ECE4'; X.beginPath(); X.roundRect(-380, y0 + 40, 760, 70, 35); X.fill();
+      X.fillStyle = c; X.beginPath(); X.roundRect(-380, y0 + 40, Math.max(70, 760 * v / 50 * u), 70, 35); X.fill(); X.stroke();
+      X.fillStyle = c; X.font = '64px IB'; X.textAlign = 'right'; X.fillText(Math.round(v * u) + '%', 380, y0);
+    });
+    X.fillStyle = GREY; X.font = '28px IM'; X.textAlign = 'center'; X.fillText('Gilovich et al., Cornell, 2000', 0, 262);
+    X.restore();
+  }
+  caption(t);
+  X.globalAlpha = .55; X.fillStyle = INK; X.font = '34px IM'; X.textAlign = 'center'; X.textBaseline = 'alphabetic'; X.fillText('@constara.app', 540, 1850); X.globalAlpha = 1;
+};
+function DUR_END() { return T.dur; }
+document.fonts.load('40px IB').then(() => document.fonts.load('40px IM')).then(() => document.fonts.ready).then(() => { window.draw(1.2); window.READY = true; });
+</script></body></html>
