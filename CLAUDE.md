@@ -11,6 +11,9 @@ Constara tətbiqinin sosial şəbəkə avtomatlaşdırması. Hazırda **@constar
 - «Avtomatik plan bu qaydaya düşmür» istisnası yeni tiplər üçün LƏĞV edilib. İstisna yalnız artıq təsdiqlənmiş formatın (bölünmüş ekran 2D siluet) yeni mövzusudur.
 - Pozuntu (11-16): M22 chat POV önizləməsiz render olundu və plana yazıldı → istifadəçi rədd etdi («ancaq mətn oxuyacaq insanlar», animasiya istəyir). Chat/mətn ekranı tipli videolar RƏDD.
 
+## 🎯 SƏHİFƏ STRATEGİYASI (istifadəçi 11-19, YENİ — köhnə «hər videoda Constara qrafiki» qaydalarından ÜSTÜN)
+Məqsəd **səhifəni böyütmək**. Videolar Constara reklamı deyil: motivasiya, intizam, finans, bacarıqlar, psixologiya və s. mövzularda **maraqlı ssenari + gözəl animasiya** ilə izləyicini çəkib saxlamaq. +1/−5 qrafik sonluğu məcburi deyil. Constara videosu yalnız istifadəçi xüsusi deyəndə hazırlanır. Ssenari qaydası: `.claude/skills/ssenari/SKILL.md` §6.
+
 ## 💡 İŞIQLI ÜSLUB (11-18-dən): bölünmüş ekran işıqlı mühərrik = `video-src/_metafor/m26_scene.html` (rəngli personaj `pal`, ağ kartda qrafik); nümunələr M26–M30. M28 «10 səhifə» timelapse (yeni tip) önizləməsi `onizleme/` — istifadəçi təsdiqi gözlənilir.
 
 ## 💡 SSENARİ SKILL-İ (istifadəçi 11-17: «videolar çox qaranlıqdır, daha başa düşülən, bəsit, hamıya xitab edən»)

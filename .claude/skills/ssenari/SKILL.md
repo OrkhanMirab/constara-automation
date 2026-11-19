@@ -18,7 +18,7 @@ Biri «xeyr»-dirsə — sadələşdir, yenidən yaz.
 ## 2. Sadəlik qaydaları
 - **Bir video = bir fikir = bir səhnə dünyası.** Abstrakt metafor (bank, buz, fənər, kölgə, güzgü) yalnız **ilk baxışda** aydındırsa. Şübhə varsa — **gündəlik real vəziyyət** seç (otaq, mətbəx, park, ofis, avtobus).
 - **Personaj = izləyicinin özü.** Tanış əşyalar: telefon, yataq, zəngli saat, idman ayaqqabısı, kitab, su butulkası, kompüter.
-- **Səbəb → nəticə görünsün:** hərəkət et → sayğac/qrafik dərhal reaksiya verir (+1 yaşıl yuxarı, −5 qırmızı aşağı). Gizli simvolika YOX.
+- **Səbəb → nəticə görünsün:** hərəkət et → nəticə dərhal görünür (sayğac, pul, enerji, dostlar, bədən…). Gizli simvolika YOX. +1/−5 sayğacı məcburi deyil — mövzuya uyğun ölçü seç.
 - **Ekranda ən çox 1 sətir mətn** (≤7 söz) + sayğac. Uzun izah diktorda, ekranda yox. «Ancaq mətn oxunan» video RƏDD (chat POV kimi).
 - **Diktor:** qısa, danışıq dili, 6–9 cümlə, hər cümlə ≤10 söz. Çətin söz yox (A2 ingilis dili).
 - **Uzunluq 15–25 s.** Hekayə 3 hissə: problem (0–3 s) → dəyişiklik (3–18 s) → nəticə + qrafik (son 4–5 s).
@@ -40,8 +40,10 @@ Biri «xeyr»-dirsə — sadələşdir, yenidən yaz.
 2. **Fasiləsiz kamera / «bir çəkiliş»** (M23, sınaqda).
 Yeni quruluş yalnız həftədə 1 dəfə və yalnız önizləmə + istifadəçi təsdiqi ilə.
 
-## 6. Constara bağı (həmişə, amma sadə)
-Sonda: həyat xətti qrafikə çevrilir (+1 / −5 görünən) → «Send this to someone who…» → `@constara.app`. Tətbiqin adı/LINK hər videoda deyil.
+## 6. Səhifə strategiyası (istifadəçi 11-19) və Constara bağı
+- **Məqsəd = səhifəni böyütmək.** Mövzular geniş: motivasiya, intizam, finans, bacarıqlar, psixologiya, məhsuldarlıq, münasibətlər, sağlamlıq. Video izləyicini **maraqlı ssenari** ilə saxlamalıdır (sirr/sual → gözlənilməz dönüş → «aha» anı), Constara reklamı deyil.
+- Adi videoda Constara/qrafik **məcburi deyil**; sonda yalnız «Send this to someone who…» / «Follow for more» + `@constara.app`.
+- **Constara videosu yalnız istifadəçi «Constara videosu hazırla» deyəndə** (onda qrafik, +1/−5, LINK).
 
 ## 7. Çıxış formatı (ssenari kartı) — istifadəçiyə və ya plana bunu yaz
 ```
