@@ -1,0 +1,6 @@
+{
+ "_izah": "Constara personajı v2 (istifadəçi 11-20): bilikli gənc — psixologiya, motivasiya və s. haqqında izləyicilərə öyrədən obraz. Konstruktor: video-src/_personaj/konstruktor.html (bu JSON-u ST kimi yüklə).",
+ "rol": "müəllim/bələdçi: hook deyir, səhnələrdə izah edir, sonda nəticə + CTA",
+ "config": {"mode":"parts","eyes":"o:dot","brows":"o:flat","nose":"o:hook","lips":"n:variant23","beard":"none","glasses":"n:variant01","hair":"Wavy","face":"Smile","body":"Hoodie","skin":"#F2C1A0","top":"#1E2533","pants":"#2B3346","shoes":"#F4F1EA","hairc":"#1B1B1B","logo":"#FF6B35","bg":"navy","logoOn":1},
+ "danisma": "ağız: lips ↔ o:talkA / o:talkE / o:o (diktor səsinin gücünə görə); göz qırpma o:closed; vurğu o:up qaş"
+}
