@@ -1,0 +1,14 @@
+{
+ "_izah": "Constara personajı v1 (istifadəçi 11-20: «bu sonuncunu yaddaşına yaz v1»). Open Peeps (CC0) əsaslı, Constara reposu marketing/sablon/poses.json + rig.js + peep.json.",
+ "hair": "Orig (peep.json hair — ilk variantın dağınıq saçı)",
+ "skin": "#F2C1A0",
+ "top": "#1E2533",
+ "pants": "#2B3346",
+ "shoes": "#F4F1EA",
+ "outline": "#1B1B1B",
+ "logo": {"color": "#FF6B35", "yer": "sinə, 'top' rəngli hissənin bbox-u: büst x .64 y .42, tam boy x .66 y .22"},
+ "sticker": "ağ stiker kənarı + kölgə (head.html filter stkL)",
+ "fon": "tünd radial #2E3A52 → #161B26",
+ "emosiyalar": {"sevinc": "BigSmile", "huzn": "Solemn", "ciddi": "Serious", "narahat": "Concerned", "yorgun": "Tired", "qetiyyetli": "Driven"},
+ "vereq": "video-src/_personaj/personaj-v1.html"
+}
