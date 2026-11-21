@@ -24,6 +24,7 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 7. **Bölünmüş ekran «X vs Y» + 2D insan siluetləri = əsas format** (11-16, n=2 partlayış / 2 video: M14, M19; avg izləmə bazanın ~1.8×-i, reach ~10×).
    Eyni hekayə tək səhnədə (M17) bazada qaldı → itələyən quruluşdur: iki panel, iki ad etiketi (THE X / THE Y), iki sayğac (SCORE, DAY), ortada DAY pill,
    bir personaj −5 büdrəyir və davam edir, o biri 0-da qalır, sonda yuxarı panel geri çəkilir → iz = qrafik (+N vs 0), son cümlə = çevrilmə, CTA «Send this to someone still…».
+   **11-22 (n=1):** ən güclü mövzu xətti — «izləmək/saxlamaq ≠ etmək» bacarıq hekayəsi + irəliləyiş həm görünür, həm eşidilir (M33). Bunu davam etdir, hər dəfə yeni bacarıq.
    Qayda: gündəlik 2 Reels-in hər ikisi bu quruluşda, **hər dəfə yeni mövzu və yeni vizual dünya** (göl, dağ olub). ~26 s, diktorlu.
 8. **Qısa 11 s loop dayandırıldı** (11-16, n=2: M15, M07 — avg izləmə ən aşağı qrupda, reach baza). Qayıtmaq yalnız istifadəçi istəsə.
 
@@ -38,8 +39,8 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 ## Saat sınağı (TR, reels; n = paylaşılan Reels sayı; qeyd = ~24 s reach medianı nisbəti bazaya, xam rəqəm yox)
 | saat | n (11-16-a qədər) | qeyd |
 |---|---|---|
-| 08:00–10:30 | 2 | 11-17 09:00 M25: reach baza, avg izləmə yaxşı; 11-19 10:00 M29: baza |
-| 11:00–12:30 | 4 | baza / aşağı (11-16 M23 11:25: baza); 11-18 11:00 M26: erkən ~1.2× |
+| 08:00–10:30 | 3 | 11-21 08:00 M33: PARTLAYIŞ (format/mövzu?); 11-17 09:00 M25: reach baza, avg izləmə yaxşı; 11-19 10:00 M29: baza |
+| 11:00–12:30 | 5 | 11-21 12:00 M34: baza; baza / aşağı (11-16 M23 11:25: baza); 11-18 11:00 M26: erkən ~1.2× |
 | 13:00 | 0 | 11-16 M20 IG xəta → ölçülmədi |
 | 14:00–15:30 | 9 | baza; 11-17 15:00 M20 IG təkrar ~2× (format?) |
 | 16:00–16:30 | 1 | 11-16 M21: baza (erkən) |
@@ -47,7 +48,7 @@ Gündəlik plan (`gun-plani.md`) bu faylın **«Aktiv qaydalar»** bölməsinə 
 | 19:00 | 2 | M19 partlayışı (format?) |
 | 20:00–21:30 | 11 | baza; 11-19 21:30 M30: erkən baza, avg izləmə yaxşı |
 | 22:00–00:30 | 4 | baza / aşağı; 11-17 22:30 M24: erkən baza |
-Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:30 (11-17) → 11:00 + 17:30 (11-18) → 10:00 + 21:30 (11-19) → 15:00 + 19:00 (11-20, istifadəçi) → **08:00 + 12:00 (11-21)** → 13:00 + 16:30 → sonra ən zəif n-li saatlar.
+Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:30 (11-17) → 11:00 + 17:30 (11-18) → 10:00 + 21:30 (11-19) → 15:00 + 19:00 (11-20, istifadəçi) → 08:00 + 12:00 (11-21) → **13:00 + 16:30 (11-22)** → sonra ən zəif n-li saatlar.
 
 ## Tip sınağı (yeni tiplər)
 | tip | ilk video | nəticə |
@@ -56,6 +57,7 @@ Sınaq sırası (növbəti boş saatlar): 13:00 + 16:30 (11-16) → 09:00 + 22:3
 | 11 s loop | M15, M07 | ❌ atıldı |
 | fasiləsiz kamera + fəsillər + REWIND loop | M23 (11-16, baza, avg aşağı), M25 (11-17 09:00, avg izləmə ~2× M23) | reach baza 2/2 → qaliblərə qoşulmadı; avg izləmə yaxşı — atılmır, nadir hallarda |
 | **İŞIQLI üslub** (gündüz, rəngli personaj; ssenari skill-i) | M26, M27 (11-18), M29, M30 (11-19) — hamısı bölünmüş ekran | n=4: reach baza (~1.0–1.2×), partlayış yox; avg izləmə qaranlıqdan yaxşı; share ~0 → saxlayır, itələnmir |
+| **İŞIQLI + bacarıq «izləmək ≠ etmək»** (M33 Gitara: tutorial izləyən vs hər gün 10 dəq çalan; səsdə eşidilən irəliləyiş) | M33 (11-21 08:00) | 🚀 PARTLAYIŞ ~10× reach, avg izləmə rekord (~1.25× M13); n=1 → 11-22 M35 Eskiz + M36 Mətbəx ilə sınanır |
 | **psixologiya «adlı effekt»** (maskot) | M32 Spotlight (11-20 15:00, istifadəçi təsdiqi) | erkən ~1.15× baza, avg izləmə yaxşı (n=1) |
 | **finans «kiçik xərc → böyük rəqəm»** (motion, kinetik rəqəm) | M31 Latte (11-20 19:00, istifadəçi təsdiqi) | ⚠ praktiki paylanmadı (reach ~0) — səbəb aydın deyil (tövsiyə uyğunsuzluğu?), qərar üçün tez |
 | **tək sabit kadr TIMELAPSE** (işıqlı otaq, 365 gün, rəf dolur, plakat = qrafik) | M28 «10 səhifə» (11-18 önizləmə göndərildi) | 🛑 istifadəçi təsdiqi gözlənilir → təsdiqlənsə növbəti gecə render + plan (yeni tip slotu) |
@@ -89,6 +91,7 @@ sugar, drinking, caffeine, gambling, smoking, junk food, scroll (11-11 vəziyyə
 - **M14 «Fənər» ilk dəfə ~130 tavanını keçdi (11-15, n=1).** vape videosundan (11-09) sonra 16-cı Reels. İlk 10 saatda bütün metaforlar kimi ~130-da dayandı, sonra **ikinci dalğa** (10→17 s arası reach ~+35%), gec gələn izləyicilər daha uzun baxdı. Share/save 0 → itələyən siqnal göndərmə yox, **izləmə müddəti + geniş mövzu** (perfeksionizm/«just start» — niş yox, hamıya aid). Güclü tərəflər: bölünmüş ekranda **iki personajın qarşıdurması** (izləyici «mən hansıyam?» deyir), daima artan sayğaclar (DAY, SCORE, PLAN vN) → sonu görmək istəyi, sonda geri çəkilmə ilə «iz = qrafik» açılışı, caption-un 1-ci sətri əmr («Stop waiting for the perfect plan. Start with a bad one.»). Qayda (sınaq): **«X vs Y» qarşıdurma + sayğac + son açılış** quruluşunu digər mövzularda da sına (səhər vs gecə, scroll vs build). M17 «Yol» = eyni hekayə, 3D premium mühərrik (`m17_yol.py`, three.js).
 
 ## Tarixçə
+- 2026-11-22: M33 Gitara PARTLADI (işıqlı üslubun ilk partlayışı, avg izləmə rekord). M34 Zəng baza, share 0. Bugün bacarıq xətti: M35 Eskiz (görünən irəliləyiş qalereyası) 13:00 + M36 Mətbəx (həyat bacarığı + pul, foley) 16:30. İzləyici 77.
 - 2026-11-21: M32 psixologiya erkən baza üstü; M31 finans praktiki paylanmadı (anomaliya). Share 0 (9 Reels). Bugün M33 Gitara (yenilik: sintez gitara səsi, ifa yaxşılaşır) 08:00 + M34 Zəng (valideynlər, fəsillər pəncərədə; göndərmə sınağı) 12:00. İzləyici 77.
 - 2026-11-20: işıqlı bölünmüş ekran n=4 hamısı ~baza, avg izləmə yaxşı, share 0 (son 8 Reels). İzləyici artımı dayanıb (78). Bugün istifadəçinin yeni strategiyası: M32 psixologiya + M31 finans (15:00, 19:00).
 - 2026-11-11: ilk analiz (29 post, 61 izləyici). Qaydalar 1–4 yazıldı.
