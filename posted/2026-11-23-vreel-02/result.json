@@ -1,0 +1,16 @@
+{
+  "instagram": {
+    "error": "video upload -> HTTP 400: {\"debug_info\":{\"retriable\":false,\"type\":\"ProcessingFailedError\",\"message\":\"Request processing failed\"}}"
+  },
+  "facebook": {
+    "video_id": "1133541429518004",
+    "permalink": "https://www.facebook.com/reel/1133541429518004/"
+  },
+  "youtube": {
+    "video_id": "xhLGlFboank",
+    "permalink": "https://www.youtube.com/shorts/xhLGlFboank",
+    "title": "Every swish started as a miss #Shorts",
+    "privacy": "private"
+  },
+  "posted_at": "2026-11-23T13:32:02.978854+00:00"
+}
