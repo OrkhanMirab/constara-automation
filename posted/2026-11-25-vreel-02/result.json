@@ -1,0 +1,16 @@
+{
+  "instagram": {
+    "error": "video upload -> HTTP 400: {\"debug_info\":{\"retriable\":false,\"type\":\"ProcessingFailedError\",\"message\":\"Request processing failed\"}}"
+  },
+  "facebook": {
+    "video_id": "1465929584877686",
+    "permalink": "https://www.facebook.com/reel/1465929584877686/"
+  },
+  "youtube": {
+    "video_id": "LI4DTpKBI4g",
+    "permalink": "https://www.youtube.com/shorts/LI4DTpKBI4g",
+    "title": "You can't watch your way to rhythm #Shorts",
+    "privacy": "private"
+  },
+  "posted_at": "2026-11-25T13:33:04.945178+00:00"
+}
